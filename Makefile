@@ -7,7 +7,10 @@ CFLAGS =-Wall -std=c++11
 CPP_FILES := $(wildcard src/*.cpp)
 APP_FILES := $(addprefix app/,$(notdir $(CPP_FILES:.cpp=)))
 
-all: $(APP_FILES)
+all: app $(APP_FILES)
+
+app:
+	mkdir -p app
 
 app/%: src/%.cpp
 	$(CC) $(CFLAGS) -o $@ $<

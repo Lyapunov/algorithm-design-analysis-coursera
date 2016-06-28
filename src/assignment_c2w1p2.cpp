@@ -30,9 +30,7 @@ int main( int argc, const char* argv[] ) {
       }
 
       std::sort(stuffs.begin(), stuffs.end(), [](Stuff a, Stuff b) {
-         return (b.weight - b.length) == (a.weight - a.length)
-                ? b.weight < a.weight 
-                : (b.weight - b.length) < (a.weight - a.length);
+         return ( static_cast<double>(b.weight) / static_cast<double>(b.length) ) < ( static_cast<double>(a.weight) / static_cast<double>(a.length) );
       });
 
       if ( DEBUG_MODE ) {
