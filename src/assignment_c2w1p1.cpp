@@ -10,7 +10,7 @@
 
 #include "common_c2w1p1.h"
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.

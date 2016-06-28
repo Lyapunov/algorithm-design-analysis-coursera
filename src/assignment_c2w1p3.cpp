@@ -119,7 +119,7 @@ static bool readInput( std::string filename, Graph& graph, int debugmode = 0 )
    return true;
 }
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
