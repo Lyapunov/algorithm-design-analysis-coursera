@@ -12,17 +12,17 @@ struct Edge {
 };
 
 struct Graph {
-   int n = 0;
-   int m = 0;
+   unsigned n = 0;
+   unsigned m = 0;
    std::vector< Edge > edges;
 };
 
-std::ostream& operator<<( std::ostream& os, Edge edge ) {
+std::ostream& operator<<( std::ostream& os, const Edge& edge ) {
    os << "Edge( " << edge.first << ", " << edge.second << ", " << edge.cost << ")";
    return os;
 }
 
-std::ostream& operator<<( std::ostream& os, Graph graph ) {
+std::ostream& operator<<( std::ostream& os, const Graph& graph ) {
    os << "Graph( " << graph.n << ", " << graph.m << std::endl;
    for ( const auto& elem : graph.edges ) {
       os << "--- --- " << elem << std::endl; 
@@ -45,15 +45,25 @@ static bool readGraph( std::string filename, Graph& graph, int debugmode = 0 )
 
    Graph retval;
 
-   ss >> retval.n;
-   ss >> retval.m;
+   if ( !(ss >> retval.n ) ) {
+      return false;
+   }
+   bool is_m_given = !!(ss >> retval.m );
 
    if ( debugmode ) {
       std::cout << "=== READING GRAPH(" << retval.n << ", " << retval.m << ")" << std::endl;
    }
-   for ( int i = 0; i < retval.m; ++i ) {
+   while (true) {
       if ( !std::getline( is, line ) ) {
-         return false;
+         is.close();
+         if ( !is_m_given ) {
+            retval.m = retval.edges.size();
+         }
+         bool is_good = retval.edges.size() == retval.m;
+         if ( is_good ) {
+            graph = retval;
+         }
+         return is_good;
       }
       std::istringstream ss(line);
       Edge edge;
@@ -62,10 +72,6 @@ static bool readGraph( std::string filename, Graph& graph, int debugmode = 0 )
       ss >> edge.cost;
       retval.edges.push_back( edge );
    }
-   is.close();
-   graph = retval;
-
-   return true;
 }
 
 #endif /*GRAPH_EDGELIST*/
