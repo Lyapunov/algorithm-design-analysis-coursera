@@ -51,7 +51,11 @@ static bool readGraph( std::string filename, Graph& graph, int debugmode = 0 )
    bool is_m_given = !!(ss >> retval.m );
 
    if ( debugmode ) {
-      std::cout << "=== READING GRAPH(" << retval.n << ", " << retval.m << ")" << std::endl;
+      if ( is_m_given ) {
+         std::cout << "=== READING GRAPH(" << retval.n << ", " << retval.m << ")" << std::endl;
+      } else {
+         std::cout << "=== READING GRAPH(" << retval.n << ")" << std::endl;
+      }
    }
    while (true) {
       if ( !std::getline( is, line ) ) {
