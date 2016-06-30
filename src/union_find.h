@@ -8,7 +8,7 @@
 
 class UnionFind {
 public:
-   UnionFind( unsigned n, std::ostream* debugStream = nullptr ) : pointers_( n, 0 ), chains_( n, 0 ), sizes_( n, 1 ), debugStream_( debugStream ) {
+   UnionFind( unsigned n, std::ostream* debugStream = nullptr ) : pointers_( n, 0 ), chains_( n, 0 ), sizes_( n, 1 ), debugStream_( debugStream ), numberOfClusters_( n ) {
       for ( unsigned i = 0; i < pointers_.size(); ++i ) {
          pointers_[i] = i;
          chains_[i]   = i;
@@ -23,18 +23,29 @@ public:
       return retval;
    }
 
+   unsigned getNumberOfClusters() {
+      unsigned retval = numberOfClusters_;
+      if ( debugStream_ ) {
+         *debugStream_ << "getNumberOfClusters() -> " << retval << "; ";
+      }
+      return retval;
+   }
+
    void doUnion( unsigned i, unsigned j ) {
       unsigned leaderI = findLeaderInternal( i );
       unsigned leaderJ = findLeaderInternal( j );
 
-      // managing sizes to achieve O( n log n ) speed
-      if ( sizes_[ leaderI ] <= sizes_[ leaderJ ] ) {
-          meltFirstIntoSecond( leaderI, leaderJ );
-      } else {
-          meltFirstIntoSecond( leaderJ, leaderI );
+      if ( leaderI != leaderJ ) {
+         // managing sizes to achieve O( n log n ) speed
+         if ( sizes_[ leaderI ] <= sizes_[ leaderJ ] ) {
+             meltFirstIntoSecond( leaderI, leaderJ );
+         } else {
+             meltFirstIntoSecond( leaderJ, leaderI );
+         }
+         sizes_[ leaderJ ] += sizes_[ leaderI ];
+         sizes_[ leaderI ] = sizes_[ leaderJ ];
+         --numberOfClusters_;
       }
-      sizes_[ leaderJ ] += sizes_[ leaderI ];
-      sizes_[ leaderI ] = sizes_[ leaderJ ];
 
       if ( debugStream_ ) {
          *debugStream_ << "doUnion( " << i << ", " << j << " ) -> ";
@@ -77,6 +88,7 @@ private:
    std::vector< unsigned > chains_;
    std::vector< unsigned > sizes_;
    mutable std::ostream* debugStream_;
+   unsigned numberOfClusters_;
 };
 
 std::ostream& operator<<( std::ostream& os, const UnionFind& uf ) {
@@ -110,8 +122,29 @@ static bool uf_test_1( bool printToStd = false) {
    return result == ss.str();
 }
 
+static bool uf_test_2( bool printToStd = false) {
+   std::stringstream ss;
+   UnionFind uf(5, &ss);
+   uf.doUnion( 2, 3 );
+   uf.getNumberOfClusters();
+   uf.doUnion( 3, 4 );
+   uf.getNumberOfClusters();
+   uf.doUnion( 2, 4 );
+   uf.getNumberOfClusters();
+
+   std::string result = "doUnion( 2, 3 ) -> UnionFind( 0 1 3 3 4 ); getNumberOfClusters() -> 4; doUnion( 3, 4 ) -> UnionFind( 0 1 3 3 3 ); getNumberOfClusters() -> 3; doUnion( 2, 4 ) -> UnionFind( 0 1 3 3 3 ); getNumberOfClusters() -> 3; ";
+
+   if ( printToStd ) {
+      std::cout << ss.str() << std::endl;
+      std::cout << result << std::endl;
+   }
+
+   return result == ss.str();
+}
+
 static void uf_all_test() {
    assert( uf_test_1() );
+   assert( uf_test_2() );
 }
 
 #endif /*UNION_FIND*/
