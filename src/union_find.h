@@ -142,7 +142,7 @@ static bool uf_test_2( bool printToStd = false) {
    return result == ss.str();
 }
 
-static void uf_all_test() {
+void uf_all_test() {
    assert( uf_test_1() );
    assert( uf_test_2() );
 }
