@@ -12,10 +12,18 @@
 
 #include "union_find.h"
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 static constexpr int MAX_BITS = 30;
 
-static bool readInput( std::string filename, std::vector<unsigned>& vertices, int debugmode = 0 )
+struct InterestingPosition
+{
+   InterestingPosition( unsigned des, unsigned par ) : descriptor( des ), parent( par ) {}
+
+   unsigned descriptor;
+   unsigned parent;
+};
+
+static bool readInput( std::string filename, unsigned& bits, std::vector<unsigned>& vertices, int debugmode = 0 )
 {
    std::ifstream is;
    is.open( filename.c_str() );
@@ -28,7 +36,6 @@ static bool readInput( std::string filename, std::vector<unsigned>& vertices, in
    std::istringstream ss(line);
    int numOfNodes = 0;
    ss >> numOfNodes;
-   int bits = 0;
    ss >> bits;
    assert ( bits >= 1 );
    assert ( bits <= MAX_BITS );
@@ -42,7 +49,7 @@ static bool readInput( std::string filename, std::vector<unsigned>& vertices, in
       }
       std::istringstream ss(line);
       unsigned result = 0;
-      for ( int j = 0; j < bits; ++j ) {
+      for ( unsigned j = 0; j < bits; ++j ) {
          unsigned bit;
          ss >> bit;
          result = ( result << 1 ) + bit;
@@ -66,8 +73,10 @@ int main( int argc, const char* argv[] ) {
    } else{ 
       std::string filename = argv[1];
       
+      // basic structures
+      unsigned bits;
       std::vector<unsigned> vertices;
-      if ( !readInput( argv[1], vertices, DEBUG_MODE ) ) {
+      if ( !readInput( argv[1], bits, vertices, DEBUG_MODE ) ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
          return 1;
       }
@@ -79,5 +88,33 @@ int main( int argc, const char* argv[] ) {
             std::cout << outelem << std::endl;
          }
       }
+      
+      // union find:
+      UnionFind uf( vertices.size() );
+
+      // wunderwaffe
+      std::vector<InterestingPosition> placesOfInterest;
+      placesOfInterest.reserve( 2 * bits * vertices.size() );
+      for ( unsigned i = 0; i < vertices.size(); ++i ) {
+         placesOfInterest.push_back( InterestingPosition( vertices[i], i ) );
+         unsigned mask = 1;
+         for ( unsigned j = 0; j < bits; ++j ) {
+            placesOfInterest.push_back( InterestingPosition( vertices[i] ^ mask, i ) );
+            mask = ( mask << 1 );
+         }
+      }
+
+      std::sort(placesOfInterest.begin(), placesOfInterest.end(), [](InterestingPosition a, InterestingPosition b) {
+         return ( a.descriptor < b.descriptor );
+      });
+
+      // greedy algorithm that elliminates all edges which have the distance 1 or 2
+      for ( unsigned i = 0; i < placesOfInterest.size() - 1; ++i ) {
+         if ( placesOfInterest[i].descriptor == placesOfInterest[i+1].descriptor ) {
+            uf.doUnion( placesOfInterest[i].parent, placesOfInterest[i+1].parent );
+         }
+      }
+      
+      std::cout << uf.getNumberOfClusters() << std::endl;
    }
 }
