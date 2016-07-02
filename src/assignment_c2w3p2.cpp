@@ -13,10 +13,10 @@
 
 #include "common_c2w3p2.h"
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 unsigned long tabletKey( int i, int W ) {
-   return static_cast<unsigned>(W) * UINT_MAX + static_cast<unsigned>(i);
+   return static_cast<unsigned long>(W) * UINT_MAX + static_cast<unsigned>(i);
 }
 
 int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map<unsigned long, int>& tablet ) {
@@ -31,9 +31,19 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return found->second;
    }
 
+   // max capacity isn't enough to take the ith object:
+   const Item& myItem = items[i - 1];
+   int rest_capacity = W - myItem.weight;
+
    // main case
-   int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - items[i - 1].weight, items, tablet ) + items[i - 1].value );
+   int retval = rest_capacity >= 0
+                ? std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, rest_capacity, items, tablet ) + myItem.value )
+                : knapsack( i - 1, W, items, tablet );
    tablet[ tabletKey( i, W ) ] = retval;
+
+   if ( DEBUG_MODE ) {
+      std::cout << "knapsack( size:" << i << ", max capacity: " << W << " ) = " << retval << std::endl;
+   }
    return retval;
 }
 
@@ -67,13 +77,16 @@ int main( int argc, const char* argv[] ) {
       });
 
       if ( DEBUG_MODE ) {
+         int total = 0;
          std::cout << "=== PRINTING SORTED ITEMS" << std::endl;
          for ( const auto& elem : items ) {
             if ( DEBUG_MODE ) {
                std::cout << elem << std::endl;
+               total += elem.value;
             }
          }
-         std::cout << "=== i = " << items.size() << ", W = " << knapsack_size << std::endl;
+         std::cout << "--- i = " << items.size() << ", W = " << knapsack_size << std::endl;
+         std::cout << "--- totalvalue = " << total << std::endl;
       }
 
       // starting the main part

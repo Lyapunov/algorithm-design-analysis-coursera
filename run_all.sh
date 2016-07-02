@@ -31,3 +31,10 @@ set -x
 ./app/assignment_c2w2p2 inputs/input_c2w2p2_test_2000.txt
 ./app/assignment_c2w2p2 inputs/input_c2w2p2_test_20000.txt
 ./app/assignment_c2w2p2 inputs/input_c2w2p2_target.txt
+
+# assignment c2w3p1
+./app/assignment_c2w3p1 inputs/input_c2w3p1_test_1.txt
+./app/assignment_c2w3p1 inputs/input_c2w3p1_target.txt
+./app/assignment_c2w3p2 inputs/input_c2w3p1_test_1.txt
+./app/assignment_c2w3p2 inputs/input_c2w3p1_target.txt
+./app/assignment_c2w3p2 inputs/input_c2w3p2_target.txt

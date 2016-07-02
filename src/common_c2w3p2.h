@@ -7,7 +7,7 @@ struct Item {
 };
 
 std::ostream& operator<<( std::ostream& os, const Item& elem ) {
-   os << "--- Item( weight:" << elem.weight << ", " << elem.value << ")"; 
+   os << "--- Item( weight:" << elem.weight << ", value:" << elem.value << ")"; 
    return os;
 }
 
@@ -39,8 +39,8 @@ static bool readInput( std::string filename, int& knapsack_size, std::vector<Ite
       }
       std::istringstream ss(line);
       Item item;
-      ss >> item.weight;
       ss >> item.value;
+      ss >> item.weight;
       items.push_back( item );
    }
    is.close();
