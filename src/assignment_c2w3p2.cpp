@@ -21,12 +21,7 @@ unsigned long tabletKey( int i, int W ) {
 
 int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map<unsigned long, int>& tablet ) {
    // trivial case
-   if ( i <= 0 || W <= 0 ) {
-      return 0;
-   }
-
-   // trivial cuts
-   if ( W < items[ i - 1 ].weight ) {
+   if ( i <= 0 || W <= items[ i - 1 ].weight ) {
       return 0;
    }
 
