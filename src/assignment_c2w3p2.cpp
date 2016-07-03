@@ -31,6 +31,10 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return 0;
    }
 
+   if ( i == 1 ) {
+      return myItem.weight;
+   }
+
    // cache
    const auto& found = tablet.find( tabletKey( i, W ) );
    if ( found != tablet.end() ) {
