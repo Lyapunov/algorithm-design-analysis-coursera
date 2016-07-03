@@ -17,7 +17,10 @@ static const int DEBUG_MODE = 0;
 
 int knapsack( int i, int W, const std::vector< Item >& items ) {
    // need a tablet
-   int tablet[i+1][W+1];
+   int** tablet = new int*[i+1];
+   for(int x = 0; x < i+1; ++x) {
+      tablet[x] = new int[W+1];
+   }
 
    // noob, but ...
    for ( int j = 0; j <= i; ++j ) {
@@ -36,7 +39,13 @@ int knapsack( int i, int W, const std::vector< Item >& items ) {
       }
    }
 
-   return tablet[i][W];
+   int retval = tablet[i][W];
+   for(int x = 0; x < i+1; ++x) {
+      delete tablet[x]; 
+   }
+   delete tablet;
+
+   return retval;
 }
 
 int main( int argc, const char* argv[] ) {
