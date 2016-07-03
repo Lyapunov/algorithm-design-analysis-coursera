@@ -20,8 +20,14 @@ unsigned long tabletKey( int i, int W ) {
 }
 
 int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map<unsigned long, int>& tablet ) {
-   // trivial case
-   if ( i <= 0 || W < items[ i - 1 ].weight ) {
+   // trivial cases
+   if ( i <= 0 ) {
+      return 0;
+   }
+
+   const Item& myItem = items[i - 1];
+
+   if ( W < myItem.weight ) {
       return 0;
    }
 
@@ -32,7 +38,6 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
    }
 
    // main case
-   const Item& myItem = items[i - 1];
    int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
    tablet[ tabletKey( i, W ) ] = retval;
 
