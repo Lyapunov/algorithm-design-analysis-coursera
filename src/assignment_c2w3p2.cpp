@@ -31,14 +31,9 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return found->second;
    }
 
-   // is max capacity enough to take the ith object?
-   const Item& myItem = items[i - 1];
-   int rest_capacity = W - myItem.weight;
-
    // main case
-   int retval = rest_capacity >= 0
-                ? std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, rest_capacity, items, tablet ) + myItem.value )
-                : knapsack( i - 1, W, items, tablet );
+   const Item& myItem = items[i - 1];
+   int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
    tablet[ tabletKey( i, W ) ] = retval;
 
    if ( DEBUG_MODE ) {
