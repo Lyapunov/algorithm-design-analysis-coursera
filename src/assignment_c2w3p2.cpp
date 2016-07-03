@@ -53,6 +53,7 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
 
 int knapsack( int i, int W, std::vector< Item >& items ) {
    std::unordered_map<unsigned long, int> tablet; 
+   tablet.reserve( 20000000 );
 
    // decreasig order by weight
    std::sort(items.begin(), items.end(), [](Item a, Item b) {
