@@ -47,8 +47,26 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
    return retval;
 }
 
-int knapsack( int i, int W, const std::vector< Item >& items  ) {
+int knapsack( int i, int W, std::vector< Item >& items ) {
    std::unordered_map<unsigned long, int> tablet; 
+
+   // decreasig order by value
+   std::sort(items.begin(), items.end(), [](Item a, Item b) {
+      return a.weight < b.weight;
+   });
+
+   if ( DEBUG_MODE ) {
+      int total = 0;
+      std::cout << "--- i = " << items.size() << ", W = " << W << std::endl;
+      std::cout << "=== PRINTING SORTED ITEMS" << std::endl;
+      for ( const auto& elem : items ) {
+         if ( DEBUG_MODE ) {
+            std::cout << elem << std::endl;
+            total += elem.value;
+         }
+      }
+      std::cout << "--- totalvalue = " << total << std::endl;
+   }
 
    return knapsack( i, W, items, tablet );
 }
@@ -71,23 +89,6 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-      // decreasig order by value
-      std::sort(items.begin(), items.end(), [](Item a, Item b) {
-         return a.value >= b.value;
-      });
-
-      if ( DEBUG_MODE ) {
-         int total = 0;
-         std::cout << "=== PRINTING SORTED ITEMS" << std::endl;
-         for ( const auto& elem : items ) {
-            if ( DEBUG_MODE ) {
-               std::cout << elem << std::endl;
-               total += elem.value;
-            }
-         }
-         std::cout << "--- i = " << items.size() << ", W = " << knapsack_size << std::endl;
-         std::cout << "--- totalvalue = " << total << std::endl;
-      }
 
       // starting the main part
       std::cout << knapsack( items.size(), knapsack_size, items ) << std::endl;
