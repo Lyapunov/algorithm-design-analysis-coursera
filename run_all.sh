@@ -38,3 +38,6 @@ set -x
 ./app/assignment_c2w3p2 inputs/input_c2w3p1_test_1.txt
 ./app/assignment_c2w3p2 inputs/input_c2w3p1_target.txt
 ./app/assignment_c2w3p2 inputs/input_c2w3p2_target.txt
+
+# problem set c2w3p5
+./src/problem_set_c2w3p5.py
