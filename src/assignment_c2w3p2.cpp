@@ -94,7 +94,6 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-
       // starting the main part
       std::cout << knapsack( items.size(), knapsack_size, items ) << std::endl;
    }
