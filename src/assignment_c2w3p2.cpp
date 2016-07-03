@@ -31,7 +31,7 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return found->second;
    }
 
-   // max capacity isn't enough to take the ith object:
+   // is max capacity enough to take the ith object?
    const Item& myItem = items[i - 1];
    int rest_capacity = W - myItem.weight;
 
