@@ -6,6 +6,13 @@ struct Item {
    int value;
 };
 
+const Item operator+( const Item& lhs, const Item& rhs ) {
+   Item retval;
+   retval.weight = lhs.weight + rhs.weight;
+   retval.value  = lhs.value  + rhs.value;
+   return retval;
+}
+
 std::ostream& operator<<( std::ostream& os, const Item& elem ) {
    os << "--- Item( weight:" << elem.weight << ", value:" << elem.value << ")"; 
    return os;
