@@ -52,7 +52,7 @@ int knapsack( int i, int W, std::vector< Item >& items ) {
 
    // decreasig order by weight
    std::sort(items.begin(), items.end(), [](Item a, Item b) {
-      return a.weight < b.weight;
+      return a.weight >= b.weight;
    });
 
    if ( DEBUG_MODE ) {
