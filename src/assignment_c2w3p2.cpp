@@ -16,7 +16,7 @@
 static const int DEBUG_MODE = 0;
 
 unsigned long tabletKey( int i, int W ) {
-   return static_cast<unsigned long>(W) * UINT_MAX + static_cast<unsigned>(i);
+   return ( static_cast<unsigned long>(W) << 32 ) | static_cast<unsigned>(i);
 }
 
 int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map<unsigned long, int>& tablet ) {
