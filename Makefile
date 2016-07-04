@@ -13,4 +13,4 @@ app:
 	mkdir -p app
 
 app/%: src/%.cpp
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) -O3 -o $@ $<
