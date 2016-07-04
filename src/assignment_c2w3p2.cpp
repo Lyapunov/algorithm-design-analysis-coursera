@@ -13,7 +13,7 @@
 
 #include "common_c2w3p2.h"
 
-static const int DEBUG_MODE = 0;
+static constexpr int DEBUG_MODE = 0;
 
 unsigned long tabletKey( int i, int W ) {
    return ( static_cast<unsigned long>(W) << 32 ) | static_cast<unsigned>(i);
@@ -35,15 +35,17 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return myItem.value;
    }
 
+   const auto myKey = tabletKey( i, W );
+
    // cache
-   const auto& found = tablet.find( tabletKey( i, W ) );
+   const auto& found = tablet.find( myKey );
    if ( found != tablet.end() ) {
       return found->second;
    }
 
    // main case
    int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
-   tablet.insert( std::make_pair( tabletKey( i, W ), retval ) );
+   tablet.emplace( myKey, retval );
 
    if ( DEBUG_MODE ) {
       std::cout << "knapsack( size:" << i << ", max capacity: " << W << " ) = " << retval << std::endl;
