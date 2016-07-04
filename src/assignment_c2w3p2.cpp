@@ -31,10 +31,6 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return 0;
    }
 
-   if ( i <= 1 || W < items[i - 2].weight ) {
-      return myItem.value;
-   }
-
    const auto myKey = tabletKey( i, W );
 
    // cache
