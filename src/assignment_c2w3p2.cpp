@@ -44,7 +44,7 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
    }
 
    // main case
-   int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
+   const int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
    tablet.emplace( myKey, retval );
 
    if ( DEBUG_MODE ) {
