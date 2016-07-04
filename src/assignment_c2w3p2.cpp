@@ -19,8 +19,8 @@ unsigned long tabletKey( int i, int W ) {
    return ( static_cast<unsigned long>(W) << 32 ) | static_cast<unsigned>(i);
 }
 
-int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map<unsigned long, int>& tablet ) {
-   const Item& myItem = items[i];
+int knapsack( int i, int W, const Item* ith_item, std::unordered_map<unsigned long, int>& tablet ) {
+   const Item& myItem = *ith_item;
    if ( W < myItem.weight ) {
       return 0;
    }
@@ -34,7 +34,7 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
    }
 
    // main case
-   const int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
+   const int retval = std::max( knapsack( i - 1, W, ith_item - 1, tablet ), knapsack( i - 1, W - myItem.weight, ith_item - 1, tablet ) + myItem.value );
    tablet.emplace( myKey, retval );
 
    if ( DEBUG_MODE ) {
@@ -71,7 +71,7 @@ int knapsack( int i, int W, std::vector< Item >& items ) {
       std::cout << "--- totalvalue = " << total << std::endl;
    }
 
-   return knapsack( i, W, items, tablet );
+   return knapsack( i, W, &items[i], tablet );
 }
 
 int main( int argc, const char* argv[] ) {
