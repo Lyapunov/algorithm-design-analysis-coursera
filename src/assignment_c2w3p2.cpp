@@ -38,7 +38,7 @@ int knapsack( int i, int W, const Item* ith_item, std::unordered_map<unsigned lo
    tablet.emplace( myKey, retval );
 
    if ( DEBUG_MODE ) {
-      std::cout << "knapsack( size:" << i << ", max capacity: " << W << " ) = " << retval << std::endl;
+      std::cout << "- knapsack( size:" << i << ", max capacity: " << W << " ) = " << retval << std::endl;
    }
    return retval;
 }
