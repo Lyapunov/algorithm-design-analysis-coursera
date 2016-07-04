@@ -31,8 +31,8 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
       return 0;
    }
 
-   if ( i == 1 ) {
-      return myItem.weight;
+   if ( i <= 1 || W < items[i - 2].weight ) {
+      return myItem.value;
    }
 
    // cache
@@ -43,7 +43,7 @@ int knapsack( int i, int W, const std::vector< Item >& items, std::unordered_map
 
    // main case
    int retval = std::max( knapsack( i - 1, W, items, tablet ), knapsack( i - 1, W - myItem.weight, items, tablet ) + myItem.value );
-   tablet[ tabletKey( i, W ) ] = retval;
+   tablet.insert( std::make_pair( tabletKey( i, W ), retval ) );
 
    if ( DEBUG_MODE ) {
       std::cout << "knapsack( size:" << i << ", max capacity: " << W << " ) = " << retval << std::endl;
