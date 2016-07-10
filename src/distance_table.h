@@ -25,17 +25,16 @@ public:
       delete tablet_;
    }
 
-   int* operator[]( size_t pos ) {
-      return tablet_[pos];
+   inline int get( size_t i, size_t j ) const {
+      return tablet_[i][j];
    }
 
-   const int* operator[]( size_t pos ) const {
-      return tablet_[pos];
-   }
-
-   static void normalize( int& value ) {
+   inline void set( size_t i, size_t j, int value ) {
+      // normalization
       if ( value > infinite ) { value = infinite * 4; }
       if ( value < -infinite ) { value = -infinite * 4; }
+
+      tablet_[i][j] = value;
    }
 
    void swap( DistanceTable& other ) {

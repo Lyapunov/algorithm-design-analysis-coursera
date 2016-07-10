@@ -20,7 +20,7 @@ DistanceTable floyd( const Graph& graph ) {
    DistanceTable next_table( graph.n );
 
    for ( const auto& elem : graph.edges ) {
-      current_table[ elem.first - 1 ][ elem.second - 1 ] = elem.cost;
+      current_table.set( elem.first - 1, elem.second - 1, elem.cost );
    }
    if ( DEBUG_MODE ) {
       std::cout << current_table << std::endl;
@@ -29,8 +29,7 @@ DistanceTable floyd( const Graph& graph ) {
    for (unsigned k = 0; k < graph.n; ++k ) {
       for (unsigned i = 0; i < graph.n; ++i ) {
          for (unsigned j = 0; j < graph.n; ++j ) {
-            next_table[i][j] = std::min( current_table[i][j], current_table[i][k] + current_table[k][j] );
-            DistanceTable::normalize( next_table[i][j] );
+            next_table.set( i, j, std::min( current_table.get(i, j), current_table.get(i, k) + current_table.get(k, j) ) );
          }
       }
       current_table.swap( next_table );
@@ -63,16 +62,16 @@ int main( int argc, const char* argv[] ) {
       auto result = floyd( graph );
       // detecting negative cycles
       for ( unsigned k = 0; k < graph.n; ++k ) {
-         if ( result[k][k] < 0 ) {
+         if ( result.get(k, k) < 0 ) {
             std::cout << "Detected negative circle!" << std::endl;
             return 1;
          }
       }
 
-      int minimum = result[0][0];
+      int minimum = result.get(0, 0);
       for (unsigned i = 0; i < graph.n; ++i ) {
          for (unsigned j = 0; j < graph.n; ++j ) {
-            minimum = std::min( minimum, result[i][j] );
+            minimum = std::min( minimum, result.get(i, j) );
          }
       }
       std::cout << minimum << std::endl;
