@@ -43,3 +43,11 @@ set -x
 
 # problem set c2w3p5
 ./src/problem_set_c2w3p5.py
+
+# assignment c2w4p1
+./app/assignment_c2w4p1 ./inputs/input_c2w4p1_test_1.txt
+./app/assignment_c2w4p1 ./inputs/input_c2w4p1_test_2.txt
+./app/assignment_c2w4p1 ./inputs/input_c2w4p1_target_1.txt
+./app/assignment_c2w4p1 ./inputs/input_c2w4p1_target_2.txt
+./app/assignment_c2w4p1 ./inputs/input_c2w4p1_target_3.txt
+
