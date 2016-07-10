@@ -21,7 +21,7 @@ int main( int argc, const char* argv[] ) {
    }
 
    if ( argc != 2 && argc != 3 ) {
-      std::cout << "USAGE: " << basename( argv[0] ) << " <filename>" << std::endl;
+      std::cout << "USAGE: " << basename( argv[0] ) << " <filename> [ <value of k, by default it is 4> ]" << std::endl;
       return 0;
    } else{ 
       std::string filename = argv[1];
