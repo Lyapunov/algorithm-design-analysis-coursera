@@ -19,6 +19,7 @@ public:
    MyHeap( size_t n ) { content_.reserve( n ); }
 
    void insert( const Key& key, const Value& value ) {
+      remove( key );
       assert( keys_.find( key ) == keys_.end() );
       content_.push_back( std::make_pair( key, value ) );
       const unsigned position = content_.size() - 1;
@@ -34,7 +35,9 @@ public:
    }
 
    std::pair<Key, Value> remove( const Key& key ) {
-      assert( keys_.find( key ) != keys_.end() );
+      if ( keys_.find( key ) == keys_.end() ) {
+         return std::pair<Key, Value>(); // empty
+      }
       return remove( keys_[ key ] ); 
    }
 
