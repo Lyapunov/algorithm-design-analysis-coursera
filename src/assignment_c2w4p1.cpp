@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 
@@ -10,7 +11,7 @@
 #include <algorithm>
 
 #include "graph_edgelist.h"
-#include "union_find.h"
+#include "distance_table.h"
 
 static const  int DEBUG_MODE = 1;
 
@@ -32,8 +33,10 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-      if ( DEBUG_MODE ) {
-         std::cout << graph << std::endl;
+      {
+         DistanceTable dt(10);
+         dt[5][4] = 3;
+         std::cout << dt << std::endl;
       }
    }
 }
