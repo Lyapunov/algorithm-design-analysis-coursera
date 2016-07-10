@@ -65,6 +65,7 @@ int main( int argc, const char* argv[] ) {
       for ( unsigned k = 0; k < graph.n; ++k ) {
          if ( result[k][k] < 0 ) {
             std::cout << "Detected negative circle!" << std::endl;
+            return 1;
          }
       }
 
