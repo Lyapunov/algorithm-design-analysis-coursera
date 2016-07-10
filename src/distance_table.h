@@ -33,9 +33,9 @@ public:
       return tablet_[pos];
    }
 
-   void normalize( int& value ) {
-      if ( value > infinite ) { value = infinite; }
-      if ( value < -infinite ) { value = -infinite; }
+   static void normalize( int& value ) {
+      if ( value > infinite ) { value = infinite * 4; }
+      if ( value < -infinite ) { value = -infinite * 4; }
    }
 
    void swap( DistanceTable& other ) {
@@ -69,12 +69,12 @@ private:
    void init_tablet_values() {
       for ( size_t i = 0; i < size_; ++i ) {
          for ( size_t j = 0; j < size_; ++j ) {
-            tablet_[i][j] = ( i == j ? 0 : infinite ); 
+            tablet_[i][j] = ( i == j ? 0 : infinite * 4 ); 
          }
       }
    }
 
-   static constexpr int infinite = 2<<29;
+   static constexpr int infinite = 2<<26;
    size_t size_;
    int**  tablet_;
 };
