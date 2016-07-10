@@ -19,16 +19,23 @@ public:
    MyHeap( size_t n ) { content_.reserve( n ); }
 
    void insert( Key key, Value value ) {
+      assert( keys_.find( key ) == keys_.end() );
       content_.push_back( std::make_pair( key, value ) );
-      bubble_up( content_.size() - 1 );
+      const unsigned position = content_.size() - 1;
+      keys_[ key ] = position;
+      bubble_up( position );
    }
 
    std::pair< Key, Value > pop() {
       if ( content_.size() == 0 ) {
          return std::pair<Key, Value>(); // empty
       }
-      swap_positions( 0, content_.size() - 1 ); 
+      const unsigned position = content_.size() - 1;
+      swap_positions( 0, position ); 
+      const auto retval = content_[ position ];
+      content_.pop_back();
       bubble_down( 0 );
+      return retval;
    }
 
    void debugPrint( std::ostream& os ) const {
@@ -79,6 +86,9 @@ private:
 
    inline void swap_positions( unsigned position1, unsigned position2 ) {
       std::iter_swap( begin( content_ ) + position1, begin( content_ ) + position2 );
+
+      keys_[ content_[position1].first ]  = position1;
+      keys_[ content_[position2].first ] = position2;
    }
 
    inline bool is_valid_position( unsigned position ) {
@@ -107,15 +117,44 @@ std::ostream& operator<<( std::ostream& os, const MyHeap<Key, Value>& mh ) {
 }
 
 static bool my_heap_test_1( bool printToStd = false) {
+   std::string result = "MyHeap(  );MyHeap(  1[Anna] 5[Eric] 20[Tobias] 21[Ulrich] 18[Richard] );MyHeap(  1[Anna] 3[Cecile] 2[Bob] 5[Eric] 18[Richard] 20[Tobias] 17[Peter] 21[Ulrich] 7[Gamov] );Pop: 1[Anna];Pop: 2[Bob];Pop: 3[Cecile];Pop: 5[Eric];Pop: 7[Gamov];MyHeap(  17[Peter] 18[Richard] 20[Tobias] 21[Ulrich] );Pop: 17[Peter];Pop: 18[Richard];Pop: 20[Tobias];Pop: 21[Ulrich];Pop: 0[];";
+
+   std::stringstream ss;
    MyHeap< std::string, int > myHeap; 
-   if ( printToStd ) {
-      std::cout << myHeap << std::endl;
+   ss << myHeap << ";";
+   myHeap.insert( "Ulrich", 21 );
+   myHeap.insert( "Eric", 5 );
+   myHeap.insert( "Tobias", 20 );
+   myHeap.insert( "Anna", 1 );
+   myHeap.insert( "Richard", 18 );
+   ss << myHeap << ";";
+   myHeap.insert( "Peter", 17 );
+   myHeap.insert( "Bob", 2 );
+   myHeap.insert( "Gamov", 7 );
+   myHeap.insert( "Cecile", 3 );
+   ss << myHeap << ";";
+
+   for (int i = 0; i < 5; ++i ) {
+      const auto& elem = myHeap.pop();
+      ss << "Pop: " << elem.second << "[" << elem.first << "];";
    }
-   return true;
+   ss << myHeap << ";";
+
+   bool notZero = true;
+   do {
+      const auto& elem = myHeap.pop();
+      notZero = ( elem.first != "" );
+      ss << "Pop: " << elem.second << "[" << elem.first << "];";
+   } while ( notZero );
+
+   if ( printToStd ) {
+      std::cout << ss.str();
+   }
+   return ss.str() == result;
 }
 
 void my_heap_all_test() {
-   assert( my_heap_test_1( true ) );
+   assert( my_heap_test_1() );
 }
 
 #endif /*MY_HEAP*/
