@@ -12,6 +12,12 @@ public:
       init_tablet_values();
    }
 
+   DistanceTable( const DistanceTable& ) = delete;
+
+   DistanceTable( DistanceTable&& other ) {
+      swap( other );
+   }
+
    ~DistanceTable() {
       for ( size_t i = 0; i < size_; ++i ) {
          delete tablet_[i];
@@ -30,6 +36,15 @@ public:
    void normalize( int& value ) {
       if ( value > infinite ) { value = infinite; }
       if ( value < -infinite ) { value = -infinite; }
+   }
+
+   void swap( DistanceTable& other ) {
+      size_t size   = size_;
+      int**  tablet = tablet_;
+      size_         = other.size_;
+      tablet_       = other.tablet_;
+      other.size_   = size;
+      other.tablet_ = tablet;
    }
 
    std::ostream& debugPrint( std::ostream& os ) const {

@@ -15,6 +15,11 @@
 
 static const  int DEBUG_MODE = 1;
 
+DistanceTable floyd( const Graph& graph ) {
+   DistanceTable dt( graph.n );
+   return dt;
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -33,10 +38,6 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-      {
-         DistanceTable dt(10);
-         dt[5][4] = 3;
-         std::cout << dt << std::endl;
-      }
+      auto result = floyd( graph );
    }
 }
