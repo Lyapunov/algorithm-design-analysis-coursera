@@ -10,6 +10,8 @@
 #include <algorithm>
 
 #include "graph_adjacency_list.h"
+#include "distance_table.h"
+#include "my_heap.h"
 
 static const int DEBUG_MODE = 1;
 
@@ -30,6 +32,8 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-      std::cout << graph << std::endl;
+      if ( DEBUG_MODE ) {
+         std::cout << graph << std::endl;
+      }
    }
 }

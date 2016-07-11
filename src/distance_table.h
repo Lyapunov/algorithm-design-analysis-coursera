@@ -1,6 +1,56 @@
 #ifndef DISTANCE_TABLE
 #define DISTANCE_TABLE
 
+#include <iomanip>
+
+class DistanceVector
+{
+public: 
+   DistanceVector( size_t size, size_t node ) : vector_( size, 0 ) {
+      for ( size_t i = 0; i < vector_.size(); ++i ) {
+         vector_[i] = ( i == node ? 0 : infinite * 4 ); 
+      }
+   }
+
+   inline int get( size_t i ) const {
+      return vector_[i];
+   }
+
+   inline void set( size_t i, int value ) {
+      // normalization
+      if ( value > infinite ) { value = infinite * 4; }
+      if ( value < -infinite ) { value = -infinite * 4; }
+
+      vector_[i] = value;
+   }
+
+   std::ostream& debugPrint( std::ostream& os ) const {
+      for ( const auto& value : vector_ ) {
+         if ( value >= infinite ) 
+         {
+            os << "     +inf ";
+         } else if ( value <= -infinite ) {
+            os << "     -inf ";
+         } else {
+            os << std::setw(9) << value << " ";
+         }
+      }
+      os << std::endl;
+      return os;
+   }
+
+private:
+   static constexpr int infinite = 2<<26;
+   std::vector<int> vector_;
+};
+
+std::ostream& operator<<( std::ostream& os, const DistanceVector& dv ) {
+   os << "DistanceVector(" << std::endl;
+   dv.debugPrint( os );
+   os << ")";
+   return os;
+}
+
 class DistanceTable
 {
 public: 
