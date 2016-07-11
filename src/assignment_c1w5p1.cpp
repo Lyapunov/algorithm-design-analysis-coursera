@@ -15,6 +15,19 @@
 
 static const int DEBUG_MODE = 1;
 
+DistanceVector dijkstra( const GraphAL& graph, unsigned start ) {
+   // init
+   DistanceVector retval( graph.n, start );
+   std::set<unsigned> visited_nodes;
+   visited_nodes.insert( start );
+   MyHeap< unsigned, Edge> heap( graph.n );
+   for ( const auto& elem : graph.alist[ start ] ) {
+      heap.insert( elem.second, elem );
+   }
+
+   return retval;
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -22,7 +35,7 @@ int main( int argc, const char* argv[] ) {
    }
 
    if ( argc != 2 ) {
-      std::cout << "USAGE: " << basename( argv[0] ) << " <filename> " << std::endl;
+      std::cout << "USAGE: " << basename( argv[0] ) << " <filename>" << std::endl;
       return 0;
    } else{ 
       GraphAL graph;
