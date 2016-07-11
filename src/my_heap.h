@@ -27,6 +27,8 @@ public:
       bubble_up( position );
    }
 
+   size_t size() { return keys_.size(); }
+
    std::pair< Key, Value > pop() {
       if ( content_.size() == 0 ) {
          return std::pair<Key, Value>(); // empty
