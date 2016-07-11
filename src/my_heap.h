@@ -31,14 +31,14 @@ public:
       if ( content_.size() == 0 ) {
          return std::pair<Key, Value>(); // empty
       }
-      return remove( 0 ); 
+      return remove_internal( 0 ); 
    }
 
    std::pair<Key, Value> remove( const Key& key ) {
       if ( keys_.find( key ) == keys_.end() ) {
          return std::pair<Key, Value>(); // empty
       }
-      return remove( keys_[ key ] ); 
+      return remove_internal( keys_[ key ] ); 
    }
 
    void debugPrint( std::ostream& os ) const {
@@ -50,7 +50,7 @@ public:
    }
 
 private:
-   std::pair< Key, Value > remove( unsigned position ) {
+   std::pair< Key, Value > remove_internal( unsigned position ) {
       const unsigned last_position = content_.size() - 1;
       swap_positions( position, last_position ); 
 
@@ -88,7 +88,7 @@ private:
 
       unsigned candidate = left_child; 
       if ( right_valid ) {
-         if ( content_[ left_child ].second > content_[ right_child ].second ) {
+         if ( content_[ right_child ].second < content_[ left_child ].second ) {
             candidate = right_child;
          }
       }
