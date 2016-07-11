@@ -15,46 +15,40 @@
 
 static const int DEBUG_MODE = 0;
 
-DistanceVector dijkstra( const GraphAL& graph, unsigned start ) {
+DistanceVector dijkstra( const GraphAL& graph, int start ) {
    // init
+   constexpr int infinite = 2<<28;
+
    DistanceVector retval( graph.n, start );
-   std::set<unsigned> visited_nodes;
-   visited_nodes.insert( start );
-   MyHeap< int, Edge> heap( graph.n );
-   for ( const auto& elem : graph.alist[ start ] ) {
-      heap.insert( elem.second, elem );
-      if ( DEBUG_MODE ) {
-         std::cout << "--- Inserting " << elem.second << " " << elem << std::endl;
-      }
+
+   MyHeap< int, int > heap( graph.n );
+   for ( int i = 0; i < static_cast<int>( graph.n ); ++i ) {
+      heap.insert( i, i == start ? 0 : infinite  );
+   }
+
+   if ( DEBUG_MODE ) {
+      std::cout << heap << std::endl;
    }
 
    // main loop
-   while ( heap.size() > 0 && visited_nodes.size() < graph.n ) {
-      const auto pack = heap.pop();
-      const Edge& winner = pack.second;
-      assert( pack.first == winner.second );
-
-      retval.set( winner.second, retval.get( winner.first ) + winner.cost );
-      visited_nodes.insert( winner.second );
-
+   while ( heap.size() > 0 ) {
+      const auto winner = heap.pop();
       if ( DEBUG_MODE ) {
-         std::cout << "--- Visiting " << winner.second << ", winner: " << winner << std::endl;
+         std::cout << "--- the winner is:" << winner.first << ", set it to: " << winner.second << std::endl;
       }
 
+      retval.set( winner.first, winner.second );
+
       // rewiring the heap
-      for ( const auto& candidate : graph.alist[ winner.second ] ) {
-         if ( visited_nodes.find( candidate.second ) != visited_nodes.end() ) { 
-            continue;
-         }
+      for ( const auto& candidate : graph.alist[ winner.first ] ) {
          if ( heap.check( candidate.second ) ) {
             const auto tuple = heap.remove( candidate.second );
-            const Edge& current = tuple.second;
-            assert( tuple.first == current.second );
-
-            heap.insert( candidate.second, current.cost <= candidate.cost ? current : candidate );
-         } else {
-            heap.insert( candidate.second, candidate );
+            heap.insert( candidate.second, std::min( tuple.second, std::min( winner.second + candidate.cost, infinite ) ) );
          }
+      }
+
+      if ( DEBUG_MODE ) {
+         std::cout << heap << std::endl;
       }
    }
 
