@@ -13,7 +13,7 @@
 #include "distance_table.h"
 #include "my_heap.h"
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 DistanceVector dijkstra( const GraphAL& graph, unsigned start ) {
    // init
