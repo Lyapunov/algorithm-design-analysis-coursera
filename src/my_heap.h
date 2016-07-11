@@ -36,6 +36,10 @@ public:
       return remove_internal( 0 ); 
    }
 
+   bool check( const Key& key ) const {
+      return keys_.find( key ) != keys_.end();
+   }
+
    std::pair<Key, Value> remove( const Key& key ) {
       if ( keys_.find( key ) == keys_.end() ) {
          return std::pair<Key, Value>(); // empty
