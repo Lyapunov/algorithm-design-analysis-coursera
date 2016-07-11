@@ -25,6 +25,20 @@ DistanceVector dijkstra( const GraphAL& graph, unsigned start ) {
       heap.insert( elem.second, elem );
    }
 
+   // main loop
+   while ( heap.size() > 0 && visited_nodes.size() < graph.n ) {
+      std::pair< unsigned, Edge > pack = heap.pop();
+      const Edge& edge = pack.second;
+      retval.set( edge.second, retval.get( edge.first ) + edge.cost );
+      visited_nodes.insert( edge.second );
+      // rewiring the heap
+      for ( const auto& candidate : graph.alist[ edge.second ] ) {
+         std::pair< unsigned, Edge > tuple = heap.remove( candidate.second );
+         const Edge& current = tuple.second;
+         heap.insert( candidate.second, current.cost <= candidate.cost ? current : candidate );
+      }
+   }
+
    return retval;
 }
 
