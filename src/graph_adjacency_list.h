@@ -11,6 +11,11 @@ struct Edge {
    bool isValid() {
       return first >= 0;
    }
+
+   bool operator<( const Edge& rhs )
+   {
+      return this->cost < rhs.cost;
+   }
 };
 
 struct GraphAL {
