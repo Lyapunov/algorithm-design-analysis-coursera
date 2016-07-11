@@ -88,6 +88,8 @@ static bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
          if ( !ss ) {
             continue;
          }
+         --edge.first;
+         --edge.second;
          std::cout << edge << std::endl;
          retval.alist[number - 1].push_back( edge );
       }
