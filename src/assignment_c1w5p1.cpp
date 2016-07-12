@@ -31,15 +31,25 @@ int main( int argc, const char* argv[] ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
          return 1;
       }
+      if ( static_cast<int>( graph.n ) < start_node || start_node <= 0 ) {
+         std::cerr << "ERROR invalid start_node "<< start_node << std::endl;
+         return 1;
+      }
+      for ( const auto& elem : end_nodes ) {
+         if ( static_cast<int>( graph.n ) < elem || elem <= 0 ) {
+            std::cerr << "ERROR invalid end_node "<< elem << std::endl;
+            return 1;
+         }
+      }
 
       if ( DEBUG_MODE ) {
          std::cout << graph << std::endl;
       }
 
-      std::vector<int> result = dijkstra_stl( graph, start_node );
+      std::vector<int> result = dijkstra_stl( graph, start_node - 1 );
       int total = 0;
       for ( const auto& elem : end_nodes ) {
-         total += result[ elem ];
+         total += result[ elem - 1 ];
       }
       std::cout << total << std::endl;
    }
