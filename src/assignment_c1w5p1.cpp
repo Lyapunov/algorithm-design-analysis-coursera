@@ -14,8 +14,10 @@
 
 static const int DEBUG_MODE = 0;
 
+//
 // The simpler version, with the makeshift (map + multimap) heap.
-// Easier to read, but ~20% slower. ( Because invoking find() twice. )
+// Easier to read, but ~20% slower. ( Because of invoking find() twice. )
+//
 std::vector<int> dijkstra( const GraphAL& graph, int start ) {
    // init
    constexpr int infinite = 2<<28;
@@ -48,7 +50,8 @@ std::vector<int> dijkstra( const GraphAL& graph, int start ) {
    return retval;
 }
 
-// The raw but slightly faster, only-with-stl-containers version
+//
+// The raw but slightly faster, only-stl-containers version.
 //
 std::vector<int> dijkstra_stl( const GraphAL& graph, int start ) {
    // init
