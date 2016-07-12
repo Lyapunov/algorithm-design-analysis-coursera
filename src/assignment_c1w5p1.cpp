@@ -44,6 +44,46 @@ DistanceVector dijkstra( const GraphAL& graph, int start ) {
    return retval;
 }
 
+std::vector<int> dijkstra_stl( const GraphAL& graph, int start ) {
+   // init
+   constexpr int infinite = 2<<28;
+
+   std::vector<int> retval( graph.n, 0);
+   std::multimap<int, int> heap;
+   std::map< int, std::multimap<int, int>::iterator > heap_accessors;
+
+   // the key is that [multi]{set,map} are invalidated only for an erased item
+   // so, there is no obstacle maintaining 'accessor' iterators in a separate vector
+   for ( int i = 0; i < static_cast<int>( graph.n ); ++i ) {
+      retval[i] = ( i == start ? 0 : infinite );
+      heap_accessors[i] = heap.insert( std::pair<int, int>( retval[i], i ) );
+   }
+
+   // main loop
+   while ( heap.size() > 0 ) {
+      const auto winner_value = heap.begin()->first;
+      const auto winner_node  = heap.begin()->second;
+      retval[ winner_node ] = winner_value;
+
+      heap.erase( heap.begin() );
+      heap_accessors.erase( winner_node );
+
+      // rewiring the heap
+      for ( const auto& candidate : graph.alist[ winner_node ] ) {
+         auto i = candidate.second;
+         auto itAccessor = heap_accessors.find( i );
+         if ( itAccessor != heap_accessors.end() ) {
+            auto it = itAccessor->second;
+            auto previous_value = it->first;
+            heap.erase( it );
+            heap_accessors[i] = heap.insert( std::pair<int, int>( std::min( previous_value, std::min( winner_value + candidate.cost, infinite ) ), i ) );
+         }
+      }
+   }
+
+   return retval;
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -71,10 +111,10 @@ int main( int argc, const char* argv[] ) {
          std::cout << graph << std::endl;
       }
 
-      DistanceVector result = dijkstra( graph, start_node );
+      std::vector<int> result = dijkstra_stl( graph, start_node );
       int total = 0;
       for ( const auto& elem : end_nodes ) {
-         total += result.get( elem );
+         total += result[ elem ];
       }
       std::cout << total << std::endl;
    }
