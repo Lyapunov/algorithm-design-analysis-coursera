@@ -10,33 +10,37 @@
 #include <algorithm>
 
 #include "graph_adjacency_list.h"
-#include "distance_table.h"
-#include "my_heap.h"
+#include "makeshift_stl_heap.h"
 
 static const int DEBUG_MODE = 0;
 
-DistanceVector dijkstra( const GraphAL& graph, int start ) {
+// The simpler version, with the makeshift (map + multimap) heap.
+// Easier to read, but ~20% slower. ( Because invoking find() twice. )
+std::vector<int> dijkstra( const GraphAL& graph, int start ) {
    // init
    constexpr int infinite = 2<<28;
 
-   DistanceVector retval( graph.n, start );
+   std::vector<int> retval( graph.n, 0);
+   MakeshiftStlHeap<int, int> heap;
 
-   MyHeap< int, int > heap( graph.n );
    for ( int i = 0; i < static_cast<int>( graph.n ); ++i ) {
-      heap.insert( i, i == start ? 0 : infinite  );
+      retval[i] = ( i == start ? 0 : infinite );
+      heap.insert( i, retval[i] );
    }
 
    // main loop
-   while ( heap.size() > 0 ) {
-      const auto winner = heap.pop();
+   while ( !heap.empty() ) {
+      const auto winnerPair = heap.pop();
+      const auto winner_value = winnerPair.first;
+      const auto winner_node  = winnerPair.second;
 
-      retval.set( winner.first, winner.second );
+      retval[ winner_node ] = winner_value;
 
       // rewiring the heap
-      for ( const auto& candidate : graph.alist[ winner.first ] ) {
-         if ( heap.check( candidate.second ) ) {
-            const auto tuple = heap.remove( candidate.second );
-            heap.insert( candidate.second, std::min( tuple.second, std::min( winner.second + candidate.cost, infinite ) ) );
+      for ( const auto& candidate : graph.alist[ winner_node ] ) {
+         auto i = candidate.second;
+         if ( const int* previous_value = heap.getValue( i ) ) {
+            heap.insert( i, std::min( *previous_value, std::min( winner_value + candidate.cost, infinite ) ) );
          }
       }
    }
@@ -44,6 +48,8 @@ DistanceVector dijkstra( const GraphAL& graph, int start ) {
    return retval;
 }
 
+// The raw but slightly faster, only-with-stl-containers version
+//
 std::vector<int> dijkstra_stl( const GraphAL& graph, int start ) {
    // init
    constexpr int infinite = 2<<28;
