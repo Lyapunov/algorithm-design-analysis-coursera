@@ -26,16 +26,9 @@ DistanceVector dijkstra( const GraphAL& graph, int start ) {
       heap.insert( i, i == start ? 0 : infinite  );
    }
 
-   if ( DEBUG_MODE ) {
-      std::cout << heap << std::endl;
-   }
-
    // main loop
    while ( heap.size() > 0 ) {
       const auto winner = heap.pop();
-      if ( DEBUG_MODE ) {
-         std::cout << "--- the winner is:" << winner.first << ", set it to: " << winner.second << std::endl;
-      }
 
       retval.set( winner.first, winner.second );
 
@@ -46,15 +39,8 @@ DistanceVector dijkstra( const GraphAL& graph, int start ) {
             heap.insert( candidate.second, std::min( tuple.second, std::min( winner.second + candidate.cost, infinite ) ) );
          }
       }
-
-      if ( DEBUG_MODE ) {
-         std::cout << heap << std::endl;
-      }
    }
 
-   if ( DEBUG_MODE ) {
-      std::cout << retval << std::endl;
-   }
    return retval;
 }
 
