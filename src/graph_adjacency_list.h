@@ -3,15 +3,7 @@
 
 #include <cassert>
 
-struct Edge {
-   int first = -1;
-   int second = 1;
-   int cost = -1;
-
-   bool isValid() {
-      return first >= 0;
-   }
-};
+#include "edge.h"
 
 struct GraphAL {
    unsigned n = 0;
