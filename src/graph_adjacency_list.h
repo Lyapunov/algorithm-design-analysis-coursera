@@ -8,6 +8,24 @@
 struct GraphAL {
    unsigned n = 0;
    std::vector< std::vector<Edge> > alist;
+   GraphAL invert() const {
+      GraphAL retval;
+      retval.n = this->n;
+      for ( unsigned i = 0; i < this->n; ++i ) {
+         retval.alist.push_back( std::vector<Edge>() );
+      }
+      for ( const auto& inlist : this->alist ) {
+         for ( const auto& elem : inlist ) {
+            Edge inverted;
+            inverted.first  = elem.second;
+            inverted.second = elem.first;
+            inverted.cost   = elem.cost;
+
+            retval.alist[ inverted.first ].push_back( inverted );
+         }
+      }
+      return retval;
+   }
 };
 
 std::ostream& operator<<( std::ostream& os, const Edge& edge ) {
