@@ -66,6 +66,56 @@ DistanceTable n_times_bellman_ford( const Graph& graph ) {
    return retval;
 }
 
+DistanceTable johnson( const Graph& graph ) {
+   DistanceTable retval( graph.n );
+
+   // First step: solving one Bellman-Ford on the extended graph
+   std::vector<int> magic_values;
+   {
+      Graph extendedGraph = graph;
+      for ( unsigned i = 1; i <= extendedGraph.n; ++i ) {
+         Edge edge;
+         edge.first = extendedGraph.n + 1;
+         edge.second = i;
+         edge.cost = 0;
+         extendedGraph.edges.push_back( edge );
+      }
+      ++extendedGraph.n;
+      magic_values = bellman_ford( extendedGraph, extendedGraph.n - 1 );
+      if ( !magic_values.size() ) {
+         // negative circle - it is a bit exploiting the interface, but I am getting tired
+         retval.set( 0, 0, -1 );
+         return retval;
+      }
+   }
+
+   // Transforming edge lengths into positive
+   Graph nonNegativeGraph = graph;
+   for ( auto& edge : nonNegativeGraph.edges ) {
+      edge.cost += magic_values[ edge.first - 1 ] - magic_values[ edge.second - 1 ];
+      assert( edge.cost >= 0 );
+   }
+   const GraphAL nonNegativeGraphAL = constructGraphALFromGraph( nonNegativeGraph );
+
+   // Running 'n' times Dijkstras
+   for ( unsigned i = 0; i < graph.n; ++i ) {
+      std::vector<int> round = dijkstra_stl( nonNegativeGraphAL, i );
+      if ( round.size() == graph.n ) {
+         for ( unsigned j = 0; j < round.size(); ++j ) {
+            retval.set( i, j, round[ j ] );
+         }
+      }
+   }
+
+   for ( unsigned i = 0; i < graph.n; ++i ) {
+      for ( unsigned j = 0; j < graph.n; ++j ) {
+         retval.set( i, j, retval.get( i, j ) - magic_values[ i ] + magic_values[ j ] );
+      }
+   }
+
+   return retval;
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -84,8 +134,14 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
+//    Result on 3. dataset:
+//       n x bellman_ford : 1 min 33 sec
+//       floyd            : 2.3 sec
+//       johnson          : 10 sec
+//
 //      auto result = n_times_bellman_ford( graph );
       auto result = floyd( graph );
+//      auto result = johnson( graph );
 
       // detecting negative cycles
       for ( unsigned k = 0; k < graph.n; ++k ) {
