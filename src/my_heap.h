@@ -68,7 +68,7 @@ private:
          return;
       }
 
-      unsigned parent_position = get_parent_position( position );
+      unsigned parent_position = ( position - 1 ) >> 1; // parent position
 
       if ( content_[position].second < content_[parent_position].second ) {
          swap_positions( position, parent_position ); 
@@ -77,24 +77,22 @@ private:
    }
 
    void bubble_down( unsigned parent_position ) {
-      unsigned left_child  = get_child_position( parent_position, 0 );
-      unsigned right_child = get_child_position( parent_position, 1 );
+      unsigned candidate  = ( parent_position << 1 ) + 1; // left child
 
-      bool left_valid  = is_valid_position( left_child );
-      bool right_valid = is_valid_position( right_child );
-
-      if ( !left_valid && !right_valid ) {
+      if ( candidate >= content_.size() ) {
          return;
       }
 
-      unsigned candidate = left_child; 
-      if ( right_valid ) {
-         if ( content_[ right_child ].second < content_[ left_child ].second ) {
-            candidate = right_child;
+      const auto* cont = &content_[ candidate ];
+
+      if ( candidate + 1 < content_.size() ) {
+         if ( ( cont + 1 )->second < cont->second ) {
+            ++cont;
+            ++candidate;
          }
       }
 
-      if ( content_[ candidate ].second < content_[ parent_position ].second ) {
+      if ( cont->second < content_[ parent_position ].second ) {
          swap_positions( candidate, parent_position ); 
          bubble_down( candidate );
       }
@@ -105,21 +103,6 @@ private:
 
       keys_[ content_[position1].first ] = position1;
       keys_[ content_[position2].first ] = position2;
-   }
-
-   inline bool is_valid_position( unsigned position ) {
-      return position < content_.size();
-   }
-
-   static inline unsigned get_parent_position( unsigned position ) {
-      if ( position == 0 ) {
-         assert( false );
-      }
-      return ( position - 1 ) >> 1;
-   }
-
-   static inline unsigned get_child_position( unsigned position, bool isRightChild ) {
-      return ( position << 1 ) + 1 + isRightChild;
    }
 
    std::vector< std::pair< Key, Value >> content_;
