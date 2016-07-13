@@ -2,3 +2,4 @@ core
 app
 *.o
 solutions.txt
+input_c2w4p1_large.txt
