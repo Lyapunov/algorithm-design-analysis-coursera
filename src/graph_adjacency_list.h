@@ -54,7 +54,7 @@ std::ostream& operator<<( std::ostream& os, const GraphAL& graph ) {
    return os;
 }
 
-static bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
+bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
 {
    std::ifstream is;
    is.open( filename.c_str() );
