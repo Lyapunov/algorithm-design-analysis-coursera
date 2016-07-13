@@ -99,7 +99,7 @@ DistanceTable johnson( const Graph& graph ) {
 
    // Running 'n' times Dijkstras
    for ( unsigned i = 0; i < graph.n; ++i ) {
-      std::vector<int> round = dijkstra_stl( nonNegativeGraphAL, i );
+      std::vector<int> round = dijkstra( nonNegativeGraphAL, i );
       if ( round.size() == graph.n ) {
          for ( unsigned j = 0; j < round.size(); ++j ) {
             retval.set( i, j, round[ j ] );
@@ -135,13 +135,14 @@ int main( int argc, const char* argv[] ) {
       }
 
 //    Result on 3. dataset:
-//       n x bellman_ford : 1 min 33 sec
-//       floyd            : 2.3 sec
-//       johnson          : 10 sec
+//       n x bellman_ford             : 1 min 33 sec
+//       floyd                        : 2.3 sec
+//       johnson (stl makeshift heap) : 10 sec
+//       johnson (homegrown heap)     : 1.289 sec
 //
 //      auto result = n_times_bellman_ford( graph );
-      auto result = floyd( graph );
-//      auto result = johnson( graph );
+//      auto result = floyd( graph );
+      auto result = johnson( graph );
 
       // detecting negative cycles
       for ( unsigned k = 0; k < graph.n; ++k ) {

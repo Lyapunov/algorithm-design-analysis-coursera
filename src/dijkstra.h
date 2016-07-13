@@ -7,12 +7,49 @@
 
 #include "graph_adjacency_list.h"
 #include "makeshift_stl_heap.h"
+#include "my_heap.h"
+
+//
+// The homegrown version. Fast and furious.
+//
+std::vector<int> dijkstra( const GraphAL& graph, int start ) {
+   // init
+   constexpr int infinite = 2<<28;
+
+   std::vector<int> retval( graph.n, 0);
+   MyHeap<int, int> heap( graph.n );
+
+   for ( int i = 0; i < static_cast<int>( graph.n ); ++i ) {
+      retval[i] = ( i == start ? 0 : infinite );
+      heap.insert( i, retval[i] );
+   }
+
+   // main loop
+   while ( !heap.empty() ) {
+      const auto winnerPair = heap.pop();
+      const auto winner_node  = winnerPair.first;
+      const auto winner_value = winnerPair.second;
+
+      retval[ winner_node ] = winner_value;
+
+      // rewiring the heap
+      for ( const auto& candidate : graph.alist[ winner_node ] ) {
+         auto i = candidate.second;
+         const auto heapPair = heap.remove( i );
+         if ( heapPair.first >= 0 ) {
+            heap.insert( i, std::min( heapPair.second, std::min( winner_value + candidate.cost, infinite ) ) );
+         }
+      }
+   }
+
+   return retval;
+}
 
 //
 // The simpler version, with the makeshift (map + multimap) heap.
 // Easier to read.
 //
-std::vector<int> dijkstra( const GraphAL& graph, int start ) {
+std::vector<int> dijkstra_makeshift_heap( const GraphAL& graph, int start ) {
    // init
    constexpr int infinite = 2<<28;
 

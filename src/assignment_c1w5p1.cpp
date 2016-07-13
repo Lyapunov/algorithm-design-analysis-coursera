@@ -47,7 +47,7 @@ int main( int argc, const char* argv[] ) {
          std::cout << graph << std::endl;
       }
 
-      std::vector<int> result = dijkstra_stl( graph, start_node - 1 );
+      std::vector<int> result = dijkstra( graph, start_node - 1 );
 //      std::vector<int> result = bellman_ford( graph, start_node - 1 );
       int total = 0;
       for ( const auto& elem : end_nodes ) {

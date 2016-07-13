@@ -16,33 +16,28 @@ class MyHeap
 {
 public:
    MyHeap() {}
-   MyHeap( size_t n ) { content_.reserve( n ); }
+   MyHeap( size_t n ) : content_(), keys_( n, -1 ) { content_.reserve( n ); }
 
    void insert( const Key& key, const Value& value ) {
       remove( key );
-      assert( keys_.find( key ) == keys_.end() );
       content_.push_back( std::make_pair( key, value ) );
       const unsigned position = content_.size() - 1;
       keys_[ key ] = position;
       bubble_up( position );
    }
 
-   size_t size() { return keys_.size(); }
+   bool empty() { return !content_.size(); }
 
    std::pair< Key, Value > pop() {
-      if ( content_.size() == 0 ) {
-         return std::pair<Key, Value>(); // empty
+      if ( empty() ) {
+         return std::pair<Key, Value>(-1, -1); // empty
       }
       return remove_internal( 0 ); 
    }
 
-   bool check( const Key& key ) const {
-      return keys_.find( key ) != keys_.end();
-   }
-
    std::pair<Key, Value> remove( const Key& key ) {
-      if ( keys_.find( key ) == keys_.end() ) {
-         return std::pair<Key, Value>(); // empty
+      if ( keys_[ key ] == -1 ) {
+         return std::pair<Key, Value>(-1, -1); // empty
       }
       return remove_internal( keys_[ key ] ); 
    }
@@ -62,7 +57,7 @@ private:
 
       const auto retval = content_[ last_position ];
       content_.pop_back();
-      keys_.erase( retval.first );
+      keys_[ retval.first ] = -1;
 
       bubble_down( position );
       return retval;
@@ -128,7 +123,7 @@ private:
    }
 
    std::vector< std::pair< Key, Value >> content_;
-   std::map< Key, unsigned >  keys_;
+   std::vector< Key >  keys_;
 };
 
 template < class Key, class Value >
@@ -138,21 +133,21 @@ std::ostream& operator<<( std::ostream& os, const MyHeap<Key, Value>& mh ) {
 }
 
 static bool my_heap_test_1( bool printToStd = false) {
-   std::string result = "MyHeap(  );MyHeap(  1[Anna] 5[Eric] 20[Tobias] 21[Ulrich] 18[Richard] );MyHeap(  1[Anna] 3[Cecile] 2[Bob] 5[Eric] 18[Richard] 20[Tobias] 17[Peter] 21[Ulrich] 7[Gamov] );Pop: 1[Anna];Pop: 2[Bob];Pop: 3[Cecile];Pop: 5[Eric];Pop: 7[Gamov];MyHeap(  17[Peter] 18[Richard] 20[Tobias] 21[Ulrich] );Pop: 17[Peter];Pop: 18[Richard];Pop: 20[Tobias];Pop: 21[Ulrich];Pop: 0[];";
+   std::string result = "MyHeap(  );MyHeap(  1[111] 5[99] 20[777] 21[88] 18[333] );MyHeap(  1[111] 3[666] 2[555] 5[99] 18[333] 20[777] 17[444] 21[88] 7[888] );Pop: 1[111];Pop: 2[555];Pop: 3[666];Pop: 5[99];Pop: 7[888];MyHeap(  17[444] 18[333] 20[777] 21[88] );Pop: 17[444];Pop: 18[333];Pop: 20[777];Pop: 21[88];Pop: -1[-1];";
 
    std::stringstream ss;
-   MyHeap< std::string, int > myHeap; 
+   MyHeap< int, int > myHeap(1000);
    ss << myHeap << ";";
-   myHeap.insert( "Ulrich", 21 );
-   myHeap.insert( "Eric", 5 );
-   myHeap.insert( "Tobias", 20 );
-   myHeap.insert( "Anna", 1 );
-   myHeap.insert( "Richard", 18 );
+   myHeap.insert( 88, 21 );
+   myHeap.insert( 99, 5 );
+   myHeap.insert( 777, 20 );
+   myHeap.insert( 111, 1 );
+   myHeap.insert( 333, 18 );
    ss << myHeap << ";";
-   myHeap.insert( "Peter", 17 );
-   myHeap.insert( "Bob", 2 );
-   myHeap.insert( "Gamov", 7 );
-   myHeap.insert( "Cecile", 3 );
+   myHeap.insert( 444, 17 );
+   myHeap.insert( 555, 2 );
+   myHeap.insert( 888, 7 );
+   myHeap.insert( 666, 3 );
    ss << myHeap << ";";
 
    for (int i = 0; i < 5; ++i ) {
@@ -164,40 +159,44 @@ static bool my_heap_test_1( bool printToStd = false) {
    bool notZero = true;
    do {
       const auto& elem = myHeap.pop();
-      notZero = ( elem.first != "" );
+      notZero = ( elem.first != -1 );
       ss << "Pop: " << elem.second << "[" << elem.first << "];";
    } while ( notZero );
 
    if ( printToStd ) {
-      std::cout << ss.str();
+      std::cout << ss.str() << std::endl;
+      std::cout << "---" << std::endl;
+      std::cout << result << std::endl;
    }
    return ss.str() == result;
 }
 
 static bool my_heap_test_2( bool printToStd = false) {
-   std::string result = "MyHeap(  1[Anna] 3[Cecile] 2[Bob] 5[Eric] 17[Q] 20[Tobias] 16[Peter] 21[Ulrich] 7[Gamov] 18[Richard] 19[Samuel] );Remove: 3[Cecile];MyHeap(  1[Anna] 5[Eric] 2[Bob] 7[Gamov] 17[Q] 20[Tobias] 16[Peter] 21[Ulrich] 19[Samuel] 18[Richard] );";
+   std::string result = "MyHeap(  1[111] 3[666] 2[555] 5[99] 18[333] 20[777] 16[444] 21[88] 17[888] 19[222] );Remove: 3[666];MyHeap(  1[111] 5[99] 2[555] 17[888] 18[333] 20[777] 16[444] 21[88] 19[222] );";
 
    std::stringstream ss;
-   MyHeap< std::string, int > myHeap; 
-   myHeap.insert( "Ulrich", 21 );
-   myHeap.insert( "Eric", 5 );
-   myHeap.insert( "Tobias", 20 );
-   myHeap.insert( "Anna", 1 );
-   myHeap.insert( "Richard", 18 );
-   myHeap.insert( "Peter", 16 );
-   myHeap.insert( "Bob", 2 );
-   myHeap.insert( "Gamov", 7 );
-   myHeap.insert( "Cecile", 3 );
-   myHeap.insert( "Q", 17 );
-   myHeap.insert( "Samuel", 19 );
+   MyHeap< int, int > myHeap(1000);
+   myHeap.insert( 88, 21 );
+   myHeap.insert( 99, 5 );
+   myHeap.insert( 777, 20 );
+   myHeap.insert( 111, 1 );
+   myHeap.insert( 333, 18 );
+   myHeap.insert( 444, 16 );
+   myHeap.insert( 555, 2 );
+   myHeap.insert( 888, 17 );
+   myHeap.insert( 666, 3 );
+   myHeap.insert( 888, 17 );
+   myHeap.insert( 222, 19 );
    ss << myHeap << ";";
 
-   const auto& elem = myHeap.remove( "Cecile" );
+   const auto& elem = myHeap.remove( 666 );
    ss << "Remove: " << elem.second << "[" << elem.first << "];";
    ss << myHeap << ";";
 
    if ( printToStd ) {
-      std::cout << ss.str();
+      std::cout << ss.str() << std::endl;
+      std::cout << "---" << std::endl;
+      std::cout << result << std::endl;
    }
    return ss.str() == result;
 }
