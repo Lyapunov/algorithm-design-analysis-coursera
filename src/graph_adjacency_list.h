@@ -36,7 +36,11 @@ GraphAL constructGraphALFromGraph( const Graph& graph ) {
       retval.alist.push_back( std::vector<Edge>() );
    }
    for ( const auto& edge : graph.edges ) {
-      retval.alist[edge.first].push_back( edge );
+      Edge transformed;
+      transformed.first  = edge.first  - 1;
+      transformed.second = edge.second - 1;
+      transformed.cost   = edge.cost;
+      retval.alist[transformed.first].push_back( transformed );
    }
    return retval;
 }

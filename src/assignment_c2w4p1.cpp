@@ -13,6 +13,9 @@
 #include "graph_edgelist.h"
 #include "distance_table.h"
 
+#include "dijkstra.h"
+#include "bellman_ford.h"
+
 static const  int DEBUG_MODE = 0;
 
 DistanceTable floyd( const Graph& graph ) {
@@ -41,6 +44,28 @@ DistanceTable floyd( const Graph& graph ) {
    return current_table;
 }
 
+// Correct solution, however, it took 1 min and 33 seconds, so this is very slow and only for fun.
+// As expectable, for the third input it is 45 x slower than floyd(). 
+// Compare O( n ^ 2 x m ) to O ( n ^ 3 ).
+DistanceTable n_times_bellman_ford( const Graph& graph ) {
+   const GraphAL graphAL = constructGraphALFromGraph( graph );
+   DistanceTable retval( graph.n );
+
+   for ( unsigned i = 0; i < graph.n; ++i ) {
+      std::vector<int> round = bellman_ford( graphAL, i );
+      if ( round.size() == graph.n ) {
+         for ( unsigned j = 0; j < round.size(); ++j ) {
+            retval.set( i, j, round[ j ] );
+         }
+      } else {
+         // negative circle - it is a bit exploiting the interface, but I am getting tired
+         retval.set( i, i, -1 );
+         return retval;
+      }
+   }
+   return retval;
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -59,7 +84,9 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
+//      auto result = n_times_bellman_ford( graph );
       auto result = floyd( graph );
+
       // detecting negative cycles
       for ( unsigned k = 0; k < graph.n; ++k ) {
          if ( result.get(k, k) < 0 ) {
