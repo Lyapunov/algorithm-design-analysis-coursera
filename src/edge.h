@@ -11,4 +11,9 @@ struct Edge {
    }
 };
 
+std::ostream& operator<<( std::ostream& os, const Edge& edge ) {
+   os << "Edge( " << edge.first << ", " << edge.second << ", " << edge.cost << ")";
+   return os;
+}
+
 #endif /*_EDGE_*/

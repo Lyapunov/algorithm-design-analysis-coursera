@@ -87,4 +87,9 @@ std::vector<int> dijkstra_stl( const GraphAL& graph, int start ) {
    return retval;
 }
 
+std::vector<int> dijkstra_stl( const Graph& graph, int start ) {
+   const GraphAL graphAL = constructGraphALFromGraph( graph );
+   return dijkstra( graphAL, start );
+}
+
 #endif /*DIJKSTRA*/

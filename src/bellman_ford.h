@@ -42,4 +42,9 @@ std::vector<int> bellman_ford( const GraphAL& graph, int start ) {
    return next;
 }
 
+std::vector<int> bellman_ford( const Graph& graph, int start ) {
+   const GraphAL graphAL = constructGraphALFromGraph( graph );
+   return bellman_ford( graphAL, start );
+}
+
 #endif /*BELLMAN_FORD*/

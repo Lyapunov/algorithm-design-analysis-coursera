@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "edge.h"
+#include "graph_edgelist.h"
 
 struct GraphAL {
    unsigned n = 0;
@@ -28,9 +29,16 @@ struct GraphAL {
    }
 };
 
-std::ostream& operator<<( std::ostream& os, const Edge& edge ) {
-   os << "Edge( " << edge.first << ", " << edge.second << ", " << edge.cost << ")";
-   return os;
+GraphAL constructGraphALFromGraph( const Graph& graph ) {
+   GraphAL retval;
+   retval.n = graph.n;
+   for ( unsigned i = 0; i < graph.n; ++i ) {
+      retval.alist.push_back( std::vector<Edge>() );
+   }
+   for ( const auto& edge : graph.edges ) {
+      retval.alist[edge.first].push_back( edge );
+   }
+   return retval;
 }
 
 std::ostream& operator<<( std::ostream& os, const GraphAL& graph ) {

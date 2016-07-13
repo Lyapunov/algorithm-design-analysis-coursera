@@ -9,11 +9,6 @@ struct Graph {
    std::vector< Edge > edges;
 };
 
-std::ostream& operator<<( std::ostream& os, const Edge& edge ) {
-   os << "Edge( " << edge.first << ", " << edge.second << ", " << edge.cost << ")";
-   return os;
-}
-
 std::ostream& operator<<( std::ostream& os, const Graph& graph ) {
    os << "Graph( " << graph.n << ", " << graph.m << std::endl;
    for ( const auto& elem : graph.edges ) {
@@ -23,7 +18,7 @@ std::ostream& operator<<( std::ostream& os, const Graph& graph ) {
    return os;
 }
 
-static bool readGraph( std::string filename, Graph& graph, int debugmode = 0 )
+bool readGraph( std::string filename, Graph& graph, int debugmode = 0 )
 {
    std::ifstream is;
    is.open( filename.c_str() );
