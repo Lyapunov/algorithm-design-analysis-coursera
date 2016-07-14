@@ -99,7 +99,7 @@ private:
    }
 
    inline void swap_positions( unsigned position1, unsigned position2 ) {
-      std::iter_swap( begin( content_ ) + position1, begin( content_ ) + position2 );
+      std::swap( content_[position1], content_[position2] );
 
       keys_[ content_[position1].first ] = position1;
       keys_[ content_[position2].first ] = position2;
