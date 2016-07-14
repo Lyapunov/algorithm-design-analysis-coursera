@@ -34,11 +34,7 @@ std::vector<int> dijkstra( const GraphAL& graph, int start ) {
 
       // rewiring the heap
       for ( const auto& candidate : graph.alist[ winner_node ] ) {
-         auto i = candidate.second;
-         const auto heapPair = heap.remove( i );
-         if ( heapPair.first >= 0 ) {
-            heap.insert( i, std::min( heapPair.second, std::min( winner_value + candidate.cost, infinite ) ) );
-         }
+         heap.updateIfExistsAndLess( candidate.second, std::min( winner_value + candidate.cost, infinite ) );
       }
    }
 

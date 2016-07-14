@@ -35,6 +35,16 @@ public:
       return remove_internal( 0 ); 
    }
 
+   const void updateIfExistsAndLess( const Key& key, const Value& value ) {
+      int position = keys_[ key ];
+      if ( position >= 0 ) {
+         if ( content_[ position ].second > value ) {
+            content_[ position ].second = value;
+            bubble_up( position );
+         }
+      }
+   }
+
    std::pair<Key, Value> remove( const Key& key ) {
       if ( keys_[ key ] == -1 ) {
          return std::pair<Key, Value>(-1, -1); // empty
