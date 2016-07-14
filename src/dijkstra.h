@@ -26,15 +26,13 @@ std::vector<int> dijkstra( const GraphAL& graph, int start ) {
 
    // main loop
    while ( !heap.empty() ) {
-      const auto winnerPair = heap.pop();
-      const auto winner_node  = winnerPair.first;
-      const auto winner_value = winnerPair.second;
+      const auto winner = heap.pop();
 
-      retval[ winner_node ] = winner_value;
+      retval[ winner.first ] = winner.second;
 
       // rewiring the heap
-      for ( const auto& candidate : graph.alist[ winner_node ] ) {
-         heap.updateIfExistsAndLess( candidate.second, std::min( winner_value + candidate.cost, infinite ) );
+      for ( const auto& candidate : graph.alist[ winner.first ] ) {
+         heap.updateIfExistsAndLess( candidate.second, std::min( winner.second + candidate.cost, infinite ) );
       }
    }
 
