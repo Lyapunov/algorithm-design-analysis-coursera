@@ -18,14 +18,6 @@ public:
    MyHeap() {}
    MyHeap( size_t n ) : content_(), keys_( n, -1 ) { content_.reserve( n ); }
 
-   void insert( const Key& key, const Value& value ) {
-      remove( key );
-      content_.push_back( std::make_pair( key, value ) );
-      const unsigned position = content_.size() - 1;
-      keys_[ key ] = position;
-      bubble_up( position );
-   }
-
    bool empty() { return !content_.size(); }
 
    std::pair< Key, Value > pop() {
@@ -33,6 +25,23 @@ public:
          return std::pair<Key, Value>(-1, -1); // empty
       }
       return remove_internal( 0 ); 
+   }
+
+   void insert( const Key& key, const Value& value ) {
+      if ( keys_[ key ] >= 0 ) {
+         return;
+      }
+      content_.push_back( std::make_pair( key, value ) );
+      const unsigned position = content_.size() - 1;
+      keys_[ key ] = position;
+      bubble_up( position );
+   }
+
+   std::pair<Key, Value> remove( const Key& key ) {
+      if ( keys_[ key ] == -1 ) {
+         return std::pair<Key, Value>(-1, -1); // empty
+      }
+      return remove_internal( keys_[ key ] ); 
    }
 
    const void updateIfExistsAndLess( const Key& key, const Value& value ) {
@@ -43,13 +52,6 @@ public:
             bubble_up( position );
          }
       }
-   }
-
-   std::pair<Key, Value> remove( const Key& key ) {
-      if ( keys_[ key ] == -1 ) {
-         return std::pair<Key, Value>(-1, -1); // empty
-      }
-      return remove_internal( keys_[ key ] ); 
    }
 
    void debugPrint( std::ostream& os ) const {
