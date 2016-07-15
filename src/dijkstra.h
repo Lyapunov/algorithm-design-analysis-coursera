@@ -32,7 +32,7 @@ std::vector<int> dijkstra( const GraphAL& graph, int start ) {
 
       // rewiring the heap
       for ( const auto& candidate : graph.alist[ winner.first ] ) {
-         heap.updateIfExistsAndLess( candidate.second, std::min( winner.second + candidate.cost, infinite ) );
+         heap.updateIfExistsAndLess( candidate.second, winner.second + candidate.cost );
       }
    }
 
