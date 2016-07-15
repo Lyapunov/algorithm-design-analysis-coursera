@@ -19,9 +19,9 @@ std::vector<int> dijkstra( const GraphAL& graph, int start ) {
    std::vector<int> retval( graph.n, 0);
    MyHeap<int, int> heap( graph.n );
 
+   heap.insert( start, 0 );
    for ( int i = 0; i < static_cast<int>( graph.n ); ++i ) {
-      retval[i] = ( i == start ? 0 : infinite );
-      heap.insert( i, retval[i] );
+      heap.insert( i, infinite );
    }
 
    // main loop
