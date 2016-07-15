@@ -21,7 +21,7 @@ public:
    MyHeap() {}
    MyHeap( size_t n ) : content_(), keys_( n, -1 ) { content_.reserve( n ); }
 
-   bool empty() { return !content_.size(); }
+   bool empty() { return content_.empty(); }
 
    std::pair< Key, Value > pop() {
       if ( empty() ) {
