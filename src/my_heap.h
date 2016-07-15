@@ -14,6 +14,9 @@
 template < class Key, class Value >
 class MyHeap
 {
+private:
+   using Tuple = std::pair< Key, Value >;
+
 public:
    MyHeap() {}
    MyHeap( size_t n ) : content_(), keys_( n, -1 ) { content_.reserve( n ); }
@@ -34,7 +37,7 @@ public:
       content_.push_back( std::make_pair( key, value ) );
       const unsigned position = content_.size() - 1;
       keys_[ key ] = position;
-      bubble_up( position );
+      bubble_up( content_.data() + position );
    }
 
    std::pair<Key, Value> remove( const Key& key ) {
@@ -49,7 +52,7 @@ public:
       if ( position >= 0 ) {
          if ( content_[ position ].second > value ) {
             content_[ position ].second = value;
-            bubble_up( position );
+            bubble_up( &content_[ position ] );
          }
       }
    }
@@ -75,16 +78,17 @@ private:
       return retval;
    }
 
-   void bubble_up( unsigned position ) {
-      if ( position == 0 ) {
+   void bubble_up( Tuple* current ) {
+      Tuple* start = content_.data();
+      if ( current == start ) {
          return;
       }
 
-      unsigned parent_position = ( position - 1 ) >> 1; // parent position
+      Tuple* parent  = start + ( ( current - start - 1 ) >> 1 ); // parent position
 
-      if ( content_[position].second < content_[parent_position].second ) {
-         swap_positions( position, parent_position ); 
-         bubble_up( parent_position );
+      if ( current->second < parent->second ) {
+         swap_positions( current, parent ); 
+         bubble_up( parent );
       }
    }
 
@@ -115,7 +119,12 @@ private:
       std::swap( keys_[ content_[position1].first ], keys_[ content_[position2].first ] );
    }
 
-   std::vector< std::pair< Key, Value >> content_;
+   inline void swap_positions( Tuple* one , Tuple* other ) {
+      std::swap( *one, *other );
+      std::swap( keys_[ one->first ], keys_[ other->first ] );
+   }
+
+   std::vector< Tuple > content_;
    std::vector< Key >  keys_;
 };
 
