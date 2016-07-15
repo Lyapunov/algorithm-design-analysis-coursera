@@ -112,9 +112,7 @@ private:
 
    inline void swap_positions( unsigned position1, unsigned position2 ) {
       std::swap( content_[position1], content_[position2] );
-
-      keys_[ content_[position1].first ] = position1;
-      keys_[ content_[position2].first ] = position2;
+      std::swap( keys_[ content_[position1].first ], keys_[ content_[position2].first ] );
    }
 
    std::vector< std::pair< Key, Value >> content_;
