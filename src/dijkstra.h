@@ -21,7 +21,7 @@ std::vector<int> dijkstra( const GraphAL& graph, int start ) {
 
    heap.insert( start, 0 );
    for ( int i = 0; i < static_cast<int>( graph.n ); ++i ) {
-      heap.insert( i, infinite );
+      heap.insert( i, infinite ); // works if you cannot insert 'start' again
    }
 
    // main loop
