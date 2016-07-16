@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+      <style>
+         body {
+            margin : 0px;
+            padding: 0px;
+         }
+      </style>
+   </head>
+   <body>
+   	<canvas id="canvas" width="500" height="500">
+      Your browser doesn't support html5 canvas.
+      </canvas>
+      <script>
+         var mainItem     = document.getElementById('canvas');
+         var context      = mainItem.getContext('2d');
+
+         var screenWidth  = mainItem.width  = window.innerWidth  - 20;
+         var screenHeight = mainItem.height = window.innerHeight - 20;
+         var screenScale  = Math.min( screenWidth, screenHeight ) / 2;
+
+         var fps = 25;
+         var ANIMATION;
+
+         
+         var dataSet = [
+            [20833.3333,17100.0000],
+            [20900.0000,17066.6667],
+            [21300.0000,13016.6667],
+            [21600.0000,14150.0000],
+            [21600.0000,14966.6667],
+            [21600.0000,16500.0000],
+            [22183.3333,13133.3333],
+            [22583.3333,14300.0000],
+            [22683.3333,12716.6667],
+            [23616.6667,15866.6667],
+            [23700.0000,15933.3333],
+            [23883.3333,14533.3333],
+            [24166.6667,13250.0000],
+            [25149.1667,12365.8333],
+            [26133.3333,14500.0000],
+            [26150.0000,10550.0000],
+            [26283.3333,12766.6667],
+            [26433.3333,13433.3333],
+            [26550.0000,13850.0000],
+            [26733.3333,11683.3333],
+            [27026.1111,13051.9444],
+            [27096.1111,13415.8333],
+            [27153.6111,13203.3333],
+            [27166.6667,9833.3333 ],
+            [27233.3333,10450.0000]
+         ];
+         var minX = dataSet[0][0];
+         var minY = dataSet[0][1];
+         var maxX = minX;
+         var maxY = minY;
+         dataSet.forEach( function( xy ) {
+            minX = Math.min( minX, xy[0] );
+            minY = Math.min( minY, xy[1] );
+            maxX = Math.max( maxX, xy[0] );
+            maxY = Math.max( maxY, xy[1] );
+         } );
+
+         function drawBackground() {
+            context.fillStyle = "black";
+            context.fillRect(0,0,screenWidth,screenHeight);
+         }
+
+         function drawPoints() {
+            dataSet.forEach( function( xy ) {
+               context.fillStyle = "lightgreen";
+               var sx = ( xy[0] - minX ) / ( maxX - minX );
+               var sy = ( xy[1] - minY ) / ( maxY - minY );
+               var qx = ( sx - 0.5 ) * 1.6;
+               var qy = ( sy - 0.5 ) * 1.6;
+               var px = qx * screenScale + screenWidth / 2;
+               var py = qy * screenScale + screenHeight / 2;
+               
+               context.fillRect(px, py, 2, 2);
+            } );
+         }
+
+         // common functions 
+         function drawScene() {
+            setTimeout( function() {
+               drawBackground();
+               drawPoints();
+               ANIMATION = requestAnimationFrame(drawScene);
+            }, 1000 / fps );
+         }
+
+         function initCanvas() {
+            screenWidth  = mainItem.width  = window.innerWidth  - 20;
+            screenHeight = mainItem.height = window.innerHeight - 20;
+            screenScale  = Math.min( screenWidth, screenHeight ) / 2;
+
+            // starting the engine only if it is not running
+            if ( !ANIMATION ) {
+               drawScene();
+            }
+         }
+
+         //init
+         (function() {
+            initCanvas();
+            addEventListener('resize', initCanvas, false);
+         })();
+      </script>
+   </body>
+</html>
