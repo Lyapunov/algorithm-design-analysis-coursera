@@ -191,7 +191,7 @@ EuclidianFloat solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& b
       retval = std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ); // closing the Hamilton-cycle
    }
 
-   // we spend O( n^2 * 2^n ) time and filled up the memory, backtracing the solution won't hurt
+   // we spent O( n^2 * 2^n ) time and filled up the memory, backtracing the solution won't hurt
 
    // reconstructing the path backwards
    std::vector<unsigned> best_path;
