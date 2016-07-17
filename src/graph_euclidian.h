@@ -9,12 +9,12 @@ using EuclidianFloat = float;
 
 struct EuclidianGraph {
    unsigned n = 0;
-   std::vector< std::pair< EuclidianFloat, EuclidianFloat> > coords;
+   std::vector< std::pair< double, double> > coords;
 
    std::vector< std::vector<EuclidianFloat>> get_distance_table() const;
 };
 
-EuclidianFloat distance( std::pair<EuclidianFloat, EuclidianFloat> a, std::pair<EuclidianFloat, EuclidianFloat> b ) {
+EuclidianFloat distance( std::pair<double, double> a, std::pair<double, double> b ) {
    return sqrt( ( a.first - b.first ) * ( a.first - b.first ) + ( a.second - b.second ) * ( a.second - b.second ) );
 }
 
