@@ -20,6 +20,15 @@ std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
    return os;
 }
 
+std::ostream& operator<<( std::ostream& os, const std::vector<double>& vec ) {
+   os << "vector( ";
+   for ( const auto& elem : vec ) {
+      os << elem << " ";
+   }
+   os << ")";
+   return os;
+}
+
 // ----- Calculating binomial coefficients
 
 std::vector< std::vector< unsigned >> BinomTablet;
@@ -74,7 +83,24 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
    }
 }
 
+// ----- Solving TSP
+
+
 void solve_tsp( const EuclidianGraph& egraph ) {
+   // distance table
+   std::cout <<  "--- distances:" <<  std::endl;
+   std::vector< std::vector<double>> distances;
+   for ( unsigned i = 0; i < egraph.n; ++i ) {
+      distances.push_back( std::vector<double>( egraph.n, 0.0 ) );
+      for ( unsigned j = 0; j < egraph.n; ++j ) {
+         distances[i][j] = distance( egraph.coords[i], egraph.coords[j] );
+
+      }
+      if ( DEBUG_MODE ) {
+         std::cout <<  distances[i] <<  std::endl;
+      }
+   }
+
 }
 
 int main( int argc, const char* argv[] ) {
@@ -113,6 +139,7 @@ int main( int argc, const char* argv[] ) {
          }
       }
 
+      solve_tsp( egraph );
    }
    return 0;
 }
