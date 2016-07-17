@@ -7,7 +7,18 @@
 
 #include "graph_euclidian.h"
 
+static constexpr unsigned MAX_SIZE = 30;
+
 static const int DEBUG_MODE = 1;
+
+std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
+   os << "vector( ";
+   for ( const auto& elem : vec ) {
+      os << elem << " ";
+   }
+   os << ")";
+   return os;
+}
 
 // ----- Calculating binomial coefficients
 
@@ -28,10 +39,12 @@ binomials( unsigned n ) {
 
 void
 init_binom_tablet() {
-   for ( unsigned i = 0; i < 30; ++i ) {
+   for ( unsigned i = 0; i < MAX_SIZE; ++i ) {
       BinomTablet.push_back( binomials( i ) );
    }
 }
+
+// ----- Permutation handling
 
 // vec is ordered in an ascending order, contains a k items of {0, 1 .. (n-1)}, without repetition
 unsigned permut_number( const std::vector<unsigned>& vec, unsigned n, unsigned pos = 0, unsigned subject = 0 ) 
@@ -59,15 +72,6 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
    } else {
       restore_permut( retval, n, k, number - BinomTablet[n - 1 - subject][k - pos - 1], pos, subject + 1 );
    }
-}
-
-std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
-   os << "vector( ";
-   for ( const auto& elem : vec ) {
-      os << elem << " ";
-   }
-   os << ")";
-   return os;
 }
 
 void solve_tsp( const EuclidianGraph& egraph ) {
