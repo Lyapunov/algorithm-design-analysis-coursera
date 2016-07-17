@@ -6,6 +6,8 @@
 #include <sstream>
 #include <cassert>
 #include <math.h>
+#include <map>
+#include <algorithm>
 
 #include "graph_euclidian.h"
 
@@ -93,23 +95,12 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
 
 // ----- Solving TSP
 
-
 double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
    // distance table
    if ( DEBUG_MODE ) {
       std::cout <<  "--- distances:" <<  std::endl;
    }
-   std::vector< std::vector<double>> distances;
-   for ( unsigned i = 0; i < egraph.n; ++i ) {
-      distances.push_back( std::vector<double>( egraph.n, 0.0 ) );
-      for ( unsigned j = 0; j < egraph.n; ++j ) {
-         distances[i][j] = distance( egraph.coords[i], egraph.coords[j] );
-
-      }
-      if ( DEBUG_MODE ) {
-         std::cout <<  distances[i] <<  std::endl;
-      }
-   }
+   std::vector< std::vector<double>> distances = egraph.get_distance_table();
 
    std::vector< std::vector<double> > tablets;
    {
@@ -267,6 +258,116 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
    return retval;
 }
 
+// --- Trying to speed up TSP solver with heuristics
+
+double solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
+   // can be reduced?
+   std::map<unsigned, unsigned> reductions; 
+   std::map<unsigned, unsigned> inv_reductions; 
+   for ( unsigned i = 0; i < egraph.n; ++i ) {
+
+      // finding nearest neighbour
+      double nearest = ( i == 0 ) ? 1 : 0;
+      for ( unsigned x = 0; x < egraph.n; ++x ) {
+         if ( x == i ) {
+            continue;
+         }
+         if ( distance( egraph.coords[i], egraph.coords[x] ) < distance( egraph.coords[i], egraph.coords[nearest] ) ) {
+            nearest = x;
+         }
+      }
+
+      double minDist = distance( egraph.coords[i], egraph.coords[nearest] );
+      double minImprovement = INF_VALUE; 
+
+      for ( unsigned x = 0; x < egraph.n; ++x ) {
+         for ( unsigned y = x + 1; y < egraph.n; ++y ) {
+            if ( x == i || y == i || x == nearest || y == nearest ) {
+               continue;
+            }
+            minImprovement = std::min( minImprovement, distance( egraph.coords[x], egraph.coords[i] )
+                                                       + distance( egraph.coords[i], egraph.coords[y] )
+                                                       - distance( egraph.coords[x], egraph.coords[y] ) );
+         }
+      }
+      if ( 2 * minDist < minImprovement && reductions.find( nearest ) == reductions.end() ) {
+         if ( DEBUG_MODE ) {
+            std::cout << "--- Point " << i << " can be reduced with " << nearest << std::endl;
+         }
+         reductions[ i ] = nearest;
+         inv_reductions[ nearest ] = i;
+      }
+   }
+
+   if ( reductions.empty() ) {
+      // the easy case
+      return solve_tsp( egraph, best_travel );
+   } else {
+
+      // reducing and filling a helper
+      EuclidianGraph rgraph;
+      rgraph.n = egraph.n - reductions.size();
+      std::map<unsigned, int> helper;
+      for ( unsigned i = 0; i < egraph.n; ++i ) {
+         if ( reductions.find( i ) != reductions.end() ) {
+            helper[ i ] = -1;
+         } else {
+            rgraph.coords.push_back( egraph.coords[i] );
+            helper[ rgraph.coords.size() - 1 ] = i;
+         }
+      }
+
+      // using the solver as an internal step
+      std::vector<unsigned> reduced_travel;
+      solve_tsp( rgraph, reduced_travel );
+
+      // creating candidates based on the solution
+      for ( unsigned i = 0; i < reduced_travel.size(); ++i ) {
+         reduced_travel[i] = helper[ reduced_travel[i] ];
+      }
+
+      std::vector< std::vector<unsigned> > best_travels;
+      best_travels.push_back( reduced_travel );
+      for ( const auto& elem : inv_reductions ) {
+         unsigned num = best_travels.size();
+         for ( unsigned i = 0; i < num; ++i ) {
+            best_travels.push_back( best_travels[i] );
+            auto& bt = best_travels[i];
+            auto& bt2 = best_travels[best_travels.size() - 1];
+
+            const auto it = std::find( bt.begin(), bt.end(), elem.first );
+            assert( it != best_travels[i].end() );
+            bt.insert( it, elem.second );
+
+            const auto it2 = std::find( bt2.begin(), bt2.end(), elem.first );
+            assert( it2 != bt2.end() );
+            bt2.insert( it2 + 1, elem.second );
+         }
+      }
+
+      std::vector< std::vector<double>> distances = egraph.get_distance_table();
+
+      unsigned mini = 0;
+      double minlen = calculate_path_distance( best_travels[mini], distances );
+
+      unsigned num = best_travels.size();
+      for ( unsigned i = 0; i < num; ++i ) {
+         const double len = calculate_path_distance( best_travels[i], distances );
+         if ( DEBUG_MODE ) {
+            std::cout << len << " " << best_travels[i] << std::endl;
+         }
+         if ( len < minlen ) {
+            minlen = len;
+            mini   = i;
+         }
+      }
+
+      best_travel = best_travels[mini];      
+      return minlen;
+   }
+
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -304,7 +405,7 @@ int main( int argc, const char* argv[] ) {
       }
 
       std::vector<unsigned> best_travel;
-      const double solution = solve_tsp( egraph, best_travel );
+      const double solution = solve_tsp_tricky( egraph, best_travel );
       std::cout << solution << std::endl;
       std::cout << best_travel << std::endl;
    }

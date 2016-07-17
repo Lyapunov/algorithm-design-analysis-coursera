@@ -58,4 +58,5 @@ set -x
 # assignment c2w5p1
 ./app/assignment_c2w5p1 ./inputs/input_c2w5p1_test1.txt
 ./app/assignment_c2w5p1 ./inputs/input_c2w5p1_test2.txt
+./app/assignment_c2w5p1 ./inputs/input_c2w5p1_target.txt
 
