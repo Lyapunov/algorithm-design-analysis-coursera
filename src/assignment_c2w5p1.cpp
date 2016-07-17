@@ -200,7 +200,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
 
       unsigned last_node = 1;
       for ( unsigned i = 1; i < egraph.n; ++i ) {
-         if ( equals( std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ), retval ) ) {
+         if ( equals( tablets[ tablets.size() - 1 ][ i ] + distances[i][0], retval ) ) {
             last_node = i;
             break;
          }
