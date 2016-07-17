@@ -127,6 +127,27 @@ void solve_tsp( const EuclidianGraph& egraph ) {
 
       std::vector<double> current( permuts * egraph.n, 0.0 );
       for ( unsigned s = 0; ; ++s ) {
+         // init all related values to inf
+         for ( unsigned x = 0; x < egraph.n; ++x ) {
+            current[ s * egraph.n + x ] = INF_VALUE;
+         }
+         
+         // starting from 1, because node 0 is never dropped
+         for ( unsigned j = 1; j < curr_permut.size(); ++j ) {
+            // creating prev_permut
+            for ( unsigned x = 0; x < curr_permut.size() - 1; ++ x ) {
+               prev_permut[x] = x < j ? curr_permut[x] : curr_permut[x + 1];
+            }
+            unsigned pnumber = permut_number( prev_permut, egraph.n );
+            for ( unsigned y = 0; y < egraph.n; ++y ) {
+               if ( y == curr_permut[j] ) {
+                  continue;
+               }
+               current[ s * egraph.n + curr_permut[j] ] =
+                  std::min( current[ s * egraph.n + curr_permut[j] ],
+                            tablets[ tablets.size() - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ j ] );
+            }
+         }
 
          //  updating permuts at the end, something like a counter
          unsigned pos = 0;
@@ -137,12 +158,13 @@ void solve_tsp( const EuclidianGraph& egraph ) {
          for ( unsigned i = 1; i <= pos; ++i ) {
             curr_permut[ curr_permut.size() - 1 - pos + i] = curr_permut[ curr_permut.size() - 1 - pos + i - 1] + 1;
          }
-         // sanity check, may terminate the loop
+         // loop terminator
          if ( curr_permut[ 0 ] >= 1 ) {
             break;
          }
       }
 
+      tablets.push_back( current );
    }
 }
 
