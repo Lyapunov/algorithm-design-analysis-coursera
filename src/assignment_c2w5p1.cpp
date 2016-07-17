@@ -157,7 +157,7 @@ EuclidianFloat solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& b
          for ( unsigned j = 1; j < curr_permut.size(); ++j ) {
             unsigned previous_s = permut_number_with_skipping( curr_permut, egraph.n, j );
             for ( unsigned y = 0; y < egraph.n; ++y ) {
-               const EuclidianFloat candidate = tablets[ tablets.size() - 1 ][ previous_s * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
+               const EuclidianFloat candidate = tablets[ tablets.size() - 1 ][ previous_s * egraph.n + y ] + distances[  curr_permut[j] ][ y ];
                current[ s * egraph.n + curr_permut[j] ] =
                   std::min( current[ s * egraph.n + curr_permut[j] ], candidate );
             }
