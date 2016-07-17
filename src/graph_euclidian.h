@@ -1,6 +1,7 @@
 #ifndef GRAPH_EUCLIDIAN
 #define GRAPH_EUCLIDIAN
 
+#include <math.h>
 #include <utility>
 #include <vector>
 
@@ -8,6 +9,10 @@ struct EuclidianGraph {
    unsigned n = 0;
    std::vector< std::pair< double, double> > coords;
 };
+
+double distance( std::pair<double, double> a, std::pair<double, double> b ) {
+   return sqrt( ( a.first - b.first ) * ( a.first - b.first ) + ( a.second - b.second ) * ( a.second - b.second ) );
+}
 
 std::ostream& operator<<( std::ostream& os, const EuclidianGraph& graph ) {
    os << "EuclidianGraph( " << graph.n << std::endl;
@@ -47,8 +52,12 @@ bool readEuclidianGraph( std::string filename, EuclidianGraph& graph, int debugm
       }
       std::istringstream ss(line);
       std::pair<double, double> coord;
-      ss >> coord.first;
-      ss >> coord.second;
+      if ( !(ss >> coord.first) ) {
+         return false;
+      }
+      if ( !(ss >> coord.second) ) {
+         return false;
+      }
       retval.coords.push_back( coord );
    }
    graph = retval;
