@@ -1,5 +1,5 @@
-#ifndef GRAPH_EDGELIST
-#define GRAPH_EDGELIST
+#ifndef GRAPH_EUCLIDIAN
+#define GRAPH_EUCLIDIAN
 
 #include <utility>
 #include <vector>
@@ -55,4 +55,4 @@ bool readEuclidianGraph( std::string filename, EuclidianGraph& graph, int debugm
    return true;
 }
 
-#endif /*GRAPH_EDGELIST*/
+#endif /*GRAPH_EUCLIDIAN*/
