@@ -88,7 +88,9 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
 
 void solve_tsp( const EuclidianGraph& egraph ) {
    // distance table
-   std::cout <<  "--- distances:" <<  std::endl;
+   if ( DEBUG_MODE ) {
+      std::cout <<  "--- distances:" <<  std::endl;
+   }
    std::vector< std::vector<double>> distances;
    for ( unsigned i = 0; i < egraph.n; ++i ) {
       distances.push_back( std::vector<double>( egraph.n, 0.0 ) );
