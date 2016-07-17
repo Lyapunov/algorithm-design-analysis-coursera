@@ -20,20 +20,20 @@ inline double equals( double a, double b ) {
 static const int DEBUG_MODE = 1;
 
 std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
-   os << "vector( ";
+   os << "[ ";
    for ( const auto& elem : vec ) {
       os << elem << " ";
    }
-   os << ")";
+   os << "]";
    return os;
 }
 
 std::ostream& operator<<( std::ostream& os, const std::vector<double>& vec ) {
-   os << "vector( ";
+   os << "[ ";
    for ( const auto& elem : vec ) {
       os << elem << " ";
    }
-   os << ")";
+   os << "]";
    return os;
 }
 
@@ -205,10 +205,11 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
             break;
          }
       }
+
       if ( DEBUG_MODE ) {
          std::cout << "Adding node " << last_node << std::endl;
-         best_path.push_back( last_node );
       }
+      best_path.push_back( last_node );
 
       unsigned s = 0; // at the last round, there is only 1 set, which is numbered by 0
       for ( unsigned m = egraph.n - 1; m > 0; --m ) {
@@ -253,8 +254,8 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
          s = next_s;
          if ( DEBUG_MODE ) {
             std::cout << "Adding node " << last_node << std::endl;
-            best_path.push_back( last_node );
          }
+         best_path.push_back( last_node );
       }
 
       if ( DEBUG_MODE ) {
@@ -262,6 +263,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
       }
    }
 
+   best_travel = best_path;
    return retval;
 }
 
@@ -304,6 +306,7 @@ int main( int argc, const char* argv[] ) {
       std::vector<unsigned> best_travel;
       const double solution = solve_tsp( egraph, best_travel );
       std::cout << solution << std::endl;
+      std::cout << best_travel << std::endl;
    }
    return 0;
 }
