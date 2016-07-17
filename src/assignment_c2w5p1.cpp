@@ -47,6 +47,29 @@ unsigned permut_number( const std::vector<unsigned>& vec, unsigned n, unsigned p
    }
 }
 
+void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsigned number, unsigned pos = 0, unsigned subject = 0 )
+{
+   if ( subject >= n || pos >= k ) {
+      return;
+   }
+
+   if ( number < BinomTablet[n - 1 - subject][k - pos - 1] ) {
+      retval.push_back( subject );
+      restore_permut( retval, n, k, number, pos + 1, subject + 1 );
+   } else {
+      restore_permut( retval, n, k, number - BinomTablet[n - 1 - subject][k - pos - 1], pos, subject + 1 );
+   }
+}
+
+std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
+   os << "vector( ";
+   for ( const auto& elem : vec ) {
+      os << elem << " ";
+   }
+   os << ")";
+   return os;
+}
+
 void solve_tsp( const EuclidianGraph& egraph ) {
 }
 
@@ -72,33 +95,18 @@ int main( int argc, const char* argv[] ) {
       if ( DEBUG_MODE ) {
          std::cout << "-- Initialize binomial coefficients" <<  std::endl;
          std::cout << egraph << std::endl;
-         std::cout << "-- Testing permutation numbering." << std::endl;
-         std::cout << "-- 4 chooses 3" << std::endl;
+         std::cout << "-- Testing permutation handling." << std::endl;
+         std::cout << "-- Test 1, 4 chooses 3" << std::endl;
          std::cout << permut_number( {0,1,2}, 4 ) << std::endl;
          std::cout << permut_number( {0,1,3}, 4 ) << std::endl;
          std::cout << permut_number( {0,2,3}, 4 ) << std::endl;
          std::cout << permut_number( {1,2,3}, 4 ) << std::endl;
-         std::cout << "-- 6 chooses 3" << std::endl;
-         std::cout << permut_number( {0,1,2}, 6 ) << std::endl;
-         std::cout << permut_number( {0,1,3}, 6 ) << std::endl;
-         std::cout << permut_number( {0,1,4}, 6 ) << std::endl;
-         std::cout << permut_number( {0,1,5}, 6 ) << std::endl;
-         std::cout << permut_number( {0,2,3}, 6 ) << std::endl;
-         std::cout << permut_number( {0,2,4}, 6 ) << std::endl;
-         std::cout << permut_number( {0,2,5}, 6 ) << std::endl;
-         std::cout << permut_number( {0,3,4}, 6 ) << std::endl;
-         std::cout << permut_number( {0,3,5}, 6 ) << std::endl;
-         std::cout << permut_number( {0,4,5}, 6 ) << std::endl;
-         std::cout << permut_number( {1,2,3}, 6 ) << std::endl;
-         std::cout << permut_number( {1,2,4}, 6 ) << std::endl;
-         std::cout << permut_number( {1,2,5}, 6 ) << std::endl;
-         std::cout << permut_number( {1,3,4}, 6 ) << std::endl;
-         std::cout << permut_number( {1,3,5}, 6 ) << std::endl;
-         std::cout << permut_number( {1,4,5}, 6 ) << std::endl;
-         std::cout << permut_number( {2,3,4}, 6 ) << std::endl;
-         std::cout << permut_number( {2,3,5}, 6 ) << std::endl;
-         std::cout << permut_number( {2,4,5}, 6 ) << std::endl;
-         std::cout << permut_number( {3,4,5}, 6 ) << std::endl;
+         std::cout << "-- Test 2, 6 chooses 3" << std::endl;
+         for ( int i = 0; i < 20; ++i ) {
+            std::vector<unsigned> test1;
+            restore_permut( test1, 6, 3, i );
+            std::cout << test1 << std::endl;
+         }
       }
 
    }
