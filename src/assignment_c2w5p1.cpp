@@ -270,11 +270,16 @@ EuclidianFloat solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& b
 }
 
 // --- Trying to speed up TSP solver with heuristics
-
-EuclidianFloat solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
-   // can be reduced?
+struct EuclidianTspReduction {
    std::map<unsigned, unsigned> reductions; 
    std::map<unsigned, unsigned> inv_reductions; 
+   EuclidianGraph rgraph; // reduced graph 
+   std::map<unsigned, int> helper;
+};
+
+EuclidianTspReduction reduceEuclidianTspProblem( const EuclidianGraph& egraph ) {
+   EuclidianTspReduction retval;
+
    for ( unsigned i = 0; i < egraph.n; ++i ) {
 
       // finding nearest neighbour
@@ -301,45 +306,57 @@ EuclidianFloat solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsig
                                                        - distance( egraph.coords[x], egraph.coords[y] ) );
          }
       }
-      if ( 2 * minDist < minImprovement && reductions.find( nearest ) == reductions.end() ) {
+      if ( DEBUG_MODE ) {
+          std::cout << "--- Point " << i << " : " << minDist << " " << minImprovement << std::endl;
+      }
+
+      if ( 2 * minDist < minImprovement && retval.reductions.find( nearest ) == retval.reductions.end() ) {
          if ( DEBUG_MODE ) {
             std::cout << "--- Point " << i << " can be reduced with " << nearest << std::endl;
          }
-         reductions[ i ] = nearest;
-         inv_reductions[ nearest ] = i;
+         retval.reductions[ i ] = nearest;
+         retval.inv_reductions[ nearest ] = i;
       }
    }
 
-   if ( reductions.empty() ) {
+   // filling the reduced graph only if there is a reduction
+   if ( !retval.reductions.empty() ) {
+      // reducing and filling a helper
+      retval.rgraph.n = egraph.n - retval.reductions.size();
+      for ( unsigned i = 0; i < egraph.n; ++i ) {
+         if ( retval.reductions.find( i ) != retval.reductions.end() ) {
+            retval.helper[ i ] = -1;
+         } else {
+            retval.rgraph.coords.push_back( egraph.coords[i] );
+            retval.helper[ retval.rgraph.coords.size() - 1 ] = i;
+         }
+      }
+   }
+
+   return retval;
+}
+
+EuclidianFloat solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
+   // can be reduced?
+   EuclidianTspReduction reduced = reduceEuclidianTspProblem( egraph );
+
+   if ( reduced.reductions.empty() ) {
       // the easy case
       return solve_tsp( egraph, best_travel );
    } else {
 
-      // reducing and filling a helper
-      EuclidianGraph rgraph;
-      rgraph.n = egraph.n - reductions.size();
-      std::map<unsigned, int> helper;
-      for ( unsigned i = 0; i < egraph.n; ++i ) {
-         if ( reductions.find( i ) != reductions.end() ) {
-            helper[ i ] = -1;
-         } else {
-            rgraph.coords.push_back( egraph.coords[i] );
-            helper[ rgraph.coords.size() - 1 ] = i;
-         }
-      }
-
       // using the solver as an internal step
       std::vector<unsigned> reduced_travel;
-      solve_tsp( rgraph, reduced_travel );
+      solve_tsp( reduced.rgraph, reduced_travel );
 
       // creating candidates based on the solution
       for ( unsigned i = 0; i < reduced_travel.size(); ++i ) {
-         reduced_travel[i] = helper[ reduced_travel[i] ];
+         reduced_travel[i] = reduced.helper[ reduced_travel[i] ];
       }
 
       std::vector< std::vector<unsigned> > best_travels;
       best_travels.push_back( reduced_travel );
-      for ( const auto& elem : inv_reductions ) {
+      for ( const auto& elem : reduced.inv_reductions ) {
          unsigned num = best_travels.size();
          for ( unsigned i = 0; i < num; ++i ) {
             best_travels.push_back( best_travels[i] );
