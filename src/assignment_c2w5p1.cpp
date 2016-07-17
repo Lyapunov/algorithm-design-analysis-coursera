@@ -95,7 +95,10 @@ int main( int argc, const char* argv[] ) {
          std::cout << permut_number( {1,3,4}, 6 ) << std::endl;
          std::cout << permut_number( {1,3,5}, 6 ) << std::endl;
          std::cout << permut_number( {1,4,5}, 6 ) << std::endl;
-
+         std::cout << permut_number( {2,3,4}, 6 ) << std::endl;
+         std::cout << permut_number( {2,3,5}, 6 ) << std::endl;
+         std::cout << permut_number( {2,4,5}, 6 ) << std::endl;
+         std::cout << permut_number( {3,4,5}, 6 ) << std::endl;
       }
 
    }
