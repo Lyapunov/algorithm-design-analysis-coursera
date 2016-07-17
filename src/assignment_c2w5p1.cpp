@@ -347,7 +347,7 @@ EuclidianFloat solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsig
 
       // using the solver as an internal step
       std::vector<unsigned> reduced_travel;
-      solve_tsp( reduced.rgraph, reduced_travel );
+      solve_tsp_tricky( reduced.rgraph, reduced_travel );
 
       // creating candidates based on the solution
       for ( unsigned i = 0; i < reduced_travel.size(); ++i ) {
