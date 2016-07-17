@@ -142,7 +142,7 @@ void solve_tsp( const EuclidianGraph& egraph ) {
          for ( unsigned i = 1; i <= pos; ++i ) {
             curr_permut[ curr_permut.size() - 1 - pos + i] = curr_permut[ curr_permut.size() - 1 - pos + i - 1] + 1;
          }
-         // sanity check
+         // sanity check, may terminate the loop
          if ( curr_permut[ curr_permut.size() - 1] >= egraph.n ) {
             break;
          }
