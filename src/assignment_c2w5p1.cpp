@@ -17,7 +17,7 @@ inline double equals( double a, double b ) {
    return fabs( a - b ) < ERROR;
 }
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
    os << "[ ";
