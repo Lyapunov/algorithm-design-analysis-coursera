@@ -55,3 +55,7 @@ set -x
 ./app/assignment_c2w4p1 ./inputs/input_c2w4p1_target_2.txt
 ./app/assignment_c2w4p1 ./inputs/input_c2w4p1_target_3.txt
 
+# assignment c2w5p1
+./app/assignment_c2w5p1 ./inputs/input_c2w5p1_test1.txt
+./app/assignment_c2w5p1 ./inputs/input_c2w5p1_test2.txt
+
