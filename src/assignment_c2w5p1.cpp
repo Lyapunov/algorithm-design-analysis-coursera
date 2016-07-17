@@ -94,7 +94,7 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
 // ----- Solving TSP
 
 
-double solve_tsp( const EuclidianGraph& egraph ) {
+double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
    // distance table
    if ( DEBUG_MODE ) {
       std::cout <<  "--- distances:" <<  std::endl;
@@ -123,9 +123,11 @@ double solve_tsp( const EuclidianGraph& egraph ) {
 
    // main loop
    for ( unsigned m = 1; m < egraph.n; ++m ) {
-      std::cout <<  "--- main loop "  << m << std::endl;
       const unsigned permuts = BinomTablet[ egraph.n - 1][ m  ];
-      std::cout <<  "--- permuts: "  << permuts << std::endl;
+      if ( DEBUG_MODE ) {
+         std::cout <<  "=== === main loop "  << m << std::endl;
+         std::cout <<  "--- permuts: "  << permuts << std::endl;
+      }
       std::vector<unsigned> curr_permut( m + 1, 0 );
       for ( unsigned i = 0; i < curr_permut.size(); ++i ) {
          curr_permut[i] = i;
@@ -187,21 +189,78 @@ double solve_tsp( const EuclidianGraph& egraph ) {
 
    // we spend O( n^2 * 2^n ) time and filled up the memory, so it makes sense to backtrace the solution
 
-   unsigned lastNode = 1;
-   for ( unsigned i = 1; i < egraph.n; ++i ) {
-      if ( equals( std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ), retval ) ) {
-         lastNode = i;
-         break;
+
+
+   // reconstructing the path backwards
+   std::vector<unsigned> best_path;
+   {
+      if ( DEBUG_MODE ) {
+         std::cout <<  "=== === reconstructing optimal path " << std::endl;
+      }
+
+      unsigned last_node = 1;
+      for ( unsigned i = 1; i < egraph.n; ++i ) {
+         if ( equals( std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ), retval ) ) {
+            last_node = i;
+            break;
+         }
+      }
+      if ( DEBUG_MODE ) {
+         std::cout << "Adding node " << last_node << std::endl;
+         best_path.push_back( last_node );
+      }
+
+      unsigned s = 0; // at the last round, there is only 1 set, which is numbered by 0
+      for ( unsigned m = egraph.n - 1; m > 0; --m ) {
+         std::vector<unsigned> curr_permut;
+         restore_permut( curr_permut, egraph.n, m + 1, s ); // restoring the set
+         const double min_value = tablets[m][ s * egraph.n + last_node ];
+         if ( DEBUG_MODE ) {
+            std::cout << "--- " << curr_permut << " " << last_node << " " << min_value << std::endl;
+         }
+         bool found = false;
+         unsigned next_s = 0;
+         unsigned next_last_node = 0;
+
+         std::vector<unsigned> prev_permut( m, 0 );
+         for ( unsigned j = 1; j < curr_permut.size(); ++j ) {
+            if ( curr_permut[j] != last_node ) {
+               continue;
+            }
+            // creating prev_permut
+            for ( unsigned x = 0; x < curr_permut.size() - 1; ++ x ) {
+               prev_permut[x] = x < j ? curr_permut[x] : curr_permut[x + 1];
+            }
+            unsigned pnumber = permut_number( prev_permut, egraph.n );
+            if ( DEBUG_MODE ) {
+               std::cout << "=== " << pnumber << std::endl;
+            }
+            for ( unsigned y = 0; y < egraph.n; ++y ) {
+               const double candidate = tablets[ m - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
+               if ( DEBUG_MODE ) {
+                  std::cout << "=== === " << candidate << std::endl;
+               }
+               if ( equals( min_value, candidate ) ) {
+                  found = true;
+                  next_s = pnumber;
+                  next_last_node = y;
+               }
+            }
+         }
+
+         assert(found);
+         last_node = next_last_node;
+         s = next_s;
+         if ( DEBUG_MODE ) {
+            std::cout << "Adding node " << last_node << std::endl;
+            best_path.push_back( last_node );
+         }
+      }
+
+      if ( DEBUG_MODE ) {
+         std::cout << "Reconstructed best travel is " << best_path << std::endl;
       }
    }
-   std::cout << lastNode << std::endl;
-   // reconstructing the path backwards
-//   unsigned pnumber = 0;
-   for ( unsigned m = egraph.n - 1; m > 0; --m ) {
-      std::vector<unsigned> perm;
-//      restore_permut( perm, egraph.n, m
-   }
-
 
    return retval;
 }
@@ -242,7 +301,8 @@ int main( int argc, const char* argv[] ) {
          }
       }
 
-      const double solution = solve_tsp( egraph );
+      std::vector<unsigned> best_travel;
+      const double solution = solve_tsp( egraph, best_travel );
       std::cout << solution << std::endl;
    }
    return 0;
