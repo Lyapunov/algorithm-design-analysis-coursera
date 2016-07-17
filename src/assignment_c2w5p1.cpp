@@ -5,11 +5,17 @@
 #include <fstream>
 #include <sstream>
 #include <cassert>
+#include <math.h>
 
 #include "graph_euclidian.h"
 
 static constexpr unsigned MAX_SIZE = 30;
 static constexpr double INF_VALUE = 10e20;
+static constexpr double ERROR = 1e-7;
+
+inline double equals( double a, double b ) {
+   return fabs( a - b ) < ERROR;
+}
 
 static const int DEBUG_MODE = 1;
 
@@ -88,7 +94,7 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
 // ----- Solving TSP
 
 
-void solve_tsp( const EuclidianGraph& egraph ) {
+double solve_tsp( const EuclidianGraph& egraph ) {
    // distance table
    if ( DEBUG_MODE ) {
       std::cout <<  "--- distances:" <<  std::endl;
@@ -108,8 +114,9 @@ void solve_tsp( const EuclidianGraph& egraph ) {
    std::vector< std::vector<double> > tablets;
    {
       const unsigned permuts = BinomTablet[ egraph.n - 1 ][ 0 ];
-      std::vector<double> current( permuts * egraph.n, 0.0 );
+      std::vector<double> current( permuts * egraph.n, INF_VALUE );
       assert( permuts == 1 );
+      current[0] = 0;
 
       tablets.push_back( current );
    }
@@ -127,6 +134,10 @@ void solve_tsp( const EuclidianGraph& egraph ) {
 
       std::vector<double> current( permuts * egraph.n, 0.0 );
       for ( unsigned s = 0; ; ++s ) {
+         if ( DEBUG_MODE ) {
+            std::cout << "--- " << s << " " << curr_permut << std::endl;
+         }
+
          // init all related values to inf
          for ( unsigned x = 0; x < egraph.n; ++x ) {
             current[ s * egraph.n + x ] = INF_VALUE;
@@ -140,12 +151,9 @@ void solve_tsp( const EuclidianGraph& egraph ) {
             }
             unsigned pnumber = permut_number( prev_permut, egraph.n );
             for ( unsigned y = 0; y < egraph.n; ++y ) {
-               if ( y == curr_permut[j] ) {
-                  continue;
-               }
+               const double candidate = tablets[ tablets.size() - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
                current[ s * egraph.n + curr_permut[j] ] =
-                  std::min( current[ s * egraph.n + curr_permut[j] ],
-                            tablets[ tablets.size() - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ j ] );
+                  std::min( current[ s * egraph.n + curr_permut[j] ], candidate );
             }
          }
 
@@ -164,8 +172,38 @@ void solve_tsp( const EuclidianGraph& egraph ) {
          }
       }
 
+      if ( DEBUG_MODE ) {
+         std::cout << "=== " << current << std::endl;
+      }
+
       tablets.push_back( current );
    }
+
+   // preparing for return
+   double retval = INF_VALUE;
+   for ( unsigned i = 1; i < egraph.n; ++i ) {
+      retval = std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ); // closing the Hamilton-cycle
+   }
+
+   // we spend O( n^2 * 2^n ) time and filled up the memory, so it makes sense to backtrace the solution
+
+   unsigned lastNode = 1;
+   for ( unsigned i = 1; i < egraph.n; ++i ) {
+      if ( equals( std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ), retval ) ) {
+         lastNode = i;
+         break;
+      }
+   }
+   std::cout << lastNode << std::endl;
+   // reconstructing the path backwards
+//   unsigned pnumber = 0;
+   for ( unsigned m = egraph.n - 1; m > 0; --m ) {
+      std::vector<unsigned> perm;
+//      restore_permut( perm, egraph.n, m
+   }
+
+
+   return retval;
 }
 
 int main( int argc, const char* argv[] ) {
@@ -204,7 +242,8 @@ int main( int argc, const char* argv[] ) {
          }
       }
 
-      solve_tsp( egraph );
+      const double solution = solve_tsp( egraph );
+      std::cout << solution << std::endl;
    }
    return 0;
 }
