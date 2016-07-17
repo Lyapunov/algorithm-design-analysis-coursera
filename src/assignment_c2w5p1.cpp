@@ -79,6 +79,24 @@ unsigned permut_number( const std::vector<unsigned>& vec, unsigned n, unsigned p
    }
 }
 
+unsigned permut_number_with_skipping( const std::vector<unsigned>& vec, unsigned n, unsigned skipped_pos = 0, unsigned pos = 0, unsigned subject = 0 ) 
+{
+   if ( pos == skipped_pos ) {
+      return permut_number_with_skipping( vec, n, skipped_pos, pos + 1, subject );
+   }
+
+   const bool skipping = static_cast<bool>( skipped_pos > pos );
+   if ( pos >= vec.size() || subject + vec.size() - 1 - pos - skipping >= n - 1 || subject >= n ) {
+      return 0;
+   }
+
+   if ( vec[pos] == subject ) {
+      return permut_number_with_skipping( vec, n, skipped_pos, pos + 1, subject + 1 );
+   } else {
+      return BinomTablet[n - 1 - subject][vec.size() - pos - 1 - skipping] + permut_number_with_skipping( vec, n, skipped_pos, pos, subject + 1 ); 
+   }
+}
+
 void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsigned number, unsigned pos = 0, unsigned subject = 0 )
 {
    if ( subject >= n || pos >= k ) {
@@ -123,7 +141,6 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
       for ( unsigned i = 0; i < curr_permut.size(); ++i ) {
          curr_permut[i] = i;
       }
-      std::vector<unsigned> prev_permut( m, 0 );
 
       std::vector<double> current( permuts * egraph.n, 0.0 );
       for ( unsigned s = 0; ; ++s ) {
@@ -138,13 +155,9 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
          
          // starting from 1, because node 0 is never dropped
          for ( unsigned j = 1; j < curr_permut.size(); ++j ) {
-            // creating prev_permut
-            for ( unsigned x = 0; x < curr_permut.size() - 1; ++ x ) {
-               prev_permut[x] = x < j ? curr_permut[x] : curr_permut[x + 1];
-            }
-            unsigned pnumber = permut_number( prev_permut, egraph.n );
+            unsigned previous_s = permut_number_with_skipping( curr_permut, egraph.n, j );
             for ( unsigned y = 0; y < egraph.n; ++y ) {
-               const double candidate = tablets[ tablets.size() - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
+               const double candidate = tablets[ tablets.size() - 1 ][ previous_s * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
                current[ s * egraph.n + curr_permut[j] ] =
                   std::min( current[ s * egraph.n + curr_permut[j] ], candidate );
             }
@@ -178,9 +191,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
       retval = std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ); // closing the Hamilton-cycle
    }
 
-   // we spend O( n^2 * 2^n ) time and filled up the memory, so it makes sense to backtrace the solution
-
-
+   // we spend O( n^2 * 2^n ) time and filled up the memory, backtracing the solution won't hurt
 
    // reconstructing the path backwards
    std::vector<unsigned> best_path;
@@ -402,6 +413,20 @@ int main( int argc, const char* argv[] ) {
             restore_permut( test1, 6, 3, i );
             std::cout << test1 << std::endl;
          }
+         std::cout << "-- Test 3, skipping" << std::endl;
+         std::vector<unsigned> test1, test2, test3, test4, test5, test6;
+         restore_permut( test1, 8, 3, permut_number_with_skipping( {0,1,3,7}, 8, 1 ) );
+         std::cout << test1 << std::endl;
+         restore_permut( test2, 8, 3, permut_number_with_skipping( {0,1,3,7}, 8, 2 ) );
+         std::cout << test2 << std::endl;
+         restore_permut( test3, 8, 3, permut_number_with_skipping( {0,1,3,7}, 8, 3 ) );
+         std::cout << test3 << std::endl;
+         restore_permut( test4, 8, 3, permut_number_with_skipping( {0,5,6,7}, 8, 1 ) );
+         std::cout << test4 << std::endl;
+         restore_permut( test5, 8, 3, permut_number_with_skipping( {0,5,6,7}, 8, 2 ) );
+         std::cout << test5 << std::endl;
+         restore_permut( test6, 8, 3, permut_number_with_skipping( {0,5,6,7}, 8, 3 ) );
+         std::cout << test6 << std::endl;
       }
 
       std::vector<unsigned> best_travel;
