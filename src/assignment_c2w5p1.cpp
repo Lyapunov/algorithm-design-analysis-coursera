@@ -8,6 +8,7 @@
 #include "graph_euclidian.h"
 
 static constexpr unsigned MAX_SIZE = 30;
+static constexpr double INF_VALUE = 10e20;
 
 static const int DEBUG_MODE = 1;
 
@@ -103,6 +104,51 @@ void solve_tsp( const EuclidianGraph& egraph ) {
       }
    }
 
+   std::vector< std::vector<double> > tablets;
+   {
+      const unsigned permuts = BinomTablet[ egraph.n ][ 1 ];
+      std::vector<double> current( permuts * egraph.n, 0.0 );
+
+      // init A0
+      for ( unsigned s = 0; s < permuts; ++s ) {
+         for ( unsigned j = 0; j < egraph.n; ++j ) {
+            current[ s * egraph.n + j ] = ( s == 0 && j == 0 ? 0.0 : INF_VALUE );
+         }
+      }
+
+      tablets.push_back( current );
+   }
+
+   // main loop
+   for ( unsigned m = 1; m < egraph.n; ++m ) {
+      std::cout <<  "--- main loop "  << m << std::endl;
+      const unsigned permuts = BinomTablet[ egraph.n ][ m + 1 ];
+      std::cout <<  "--- permuts: "  << permuts << std::endl;
+      std::vector<unsigned> curr_permut( m + 1, 0 );
+      for ( unsigned i = 0; i < curr_permut.size(); ++i ) {
+         curr_permut[i] = i;
+      }
+      std::vector<unsigned> prev_permut( m, 0 );
+
+      std::vector<double> current( permuts * egraph.n, 0.0 );
+      for ( unsigned s = 0; ; ++s ) {
+
+         //  updating permuts at the end, something like a counter
+         unsigned pos = 0;
+         while ( curr_permut[ curr_permut.size() - 1 - pos] >= egraph.n - pos - 1 && pos < curr_permut.size() - 1 ) {
+            ++pos;
+         }
+         ++curr_permut[ curr_permut.size() - 1 - pos ];
+         for ( unsigned i = 1; i <= pos; ++i ) {
+            curr_permut[ curr_permut.size() - 1 - pos + i] = curr_permut[ curr_permut.size() - 1 - pos + i - 1] + 1;
+         }
+         // sanity check
+         if ( curr_permut[ curr_permut.size() - 1] >= egraph.n ) {
+            break;
+         }
+      }
+
+   }
 }
 
 int main( int argc, const char* argv[] ) {
