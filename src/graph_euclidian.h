@@ -5,23 +5,25 @@
 #include <utility>
 #include <vector>
 
+using EuclidianFloat = float;
+
 struct EuclidianGraph {
    unsigned n = 0;
-   std::vector< std::pair< double, double> > coords;
+   std::vector< std::pair< EuclidianFloat, EuclidianFloat> > coords;
 
-   std::vector< std::vector<double>> get_distance_table() const;
+   std::vector< std::vector<EuclidianFloat>> get_distance_table() const;
 };
 
-double distance( std::pair<double, double> a, std::pair<double, double> b ) {
+EuclidianFloat distance( std::pair<EuclidianFloat, EuclidianFloat> a, std::pair<EuclidianFloat, EuclidianFloat> b ) {
    return sqrt( ( a.first - b.first ) * ( a.first - b.first ) + ( a.second - b.second ) * ( a.second - b.second ) );
 }
 
-std::vector< std::vector<double>> EuclidianGraph::get_distance_table() const
+std::vector< std::vector<EuclidianFloat>> EuclidianGraph::get_distance_table() const
 {
-   std::vector< std::vector<double>>distances;
+   std::vector< std::vector<EuclidianFloat>>distances;
 
    for ( unsigned i = 0; i < this->n; ++i ) {
-      distances.push_back( std::vector<double>( this->n, 0.0 ) );
+      distances.push_back( std::vector<EuclidianFloat>( this->n, 0.0 ) );
       for ( unsigned j = 0; j < this->n; ++j ) {
          distances[i][j] = distance( this->coords[i], this->coords[j] );
 
@@ -30,8 +32,8 @@ std::vector< std::vector<double>> EuclidianGraph::get_distance_table() const
    return distances;
 }
 
-double calculate_path_distance( std::vector<unsigned>& path, const std::vector< std::vector<double>>& table ) {
-   double retval = table[path[0]][path[path.size() - 1]];
+EuclidianFloat calculate_path_distance( std::vector<unsigned>& path, const std::vector< std::vector<EuclidianFloat>>& table ) {
+   EuclidianFloat retval = table[path[0]][path[path.size() - 1]];
    for ( unsigned i = 0; i < path.size() - 1; ++i ) {
       retval += table[path[i]][path[i + 1]];
    }
@@ -75,7 +77,7 @@ bool readEuclidianGraph( std::string filename, EuclidianGraph& graph, int debugm
          return false;
       }
       std::istringstream ss(line);
-      std::pair<double, double> coord;
+      std::pair<EuclidianFloat, EuclidianFloat> coord;
       if ( !(ss >> coord.first) ) {
          return false;
       }

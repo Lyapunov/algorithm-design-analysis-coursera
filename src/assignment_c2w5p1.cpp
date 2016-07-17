@@ -12,10 +12,10 @@
 #include "graph_euclidian.h"
 
 static constexpr unsigned MAX_SIZE = 30;
-static constexpr double INF_VALUE = 10e20;
-static constexpr double ERROR = 1e-7;
+static constexpr EuclidianFloat INF_VALUE = 10e7;
+static constexpr EuclidianFloat ERROR = 1e-5;
 
-inline double equals( double a, double b ) {
+inline EuclidianFloat equals( EuclidianFloat a, EuclidianFloat b ) {
    return fabs( a - b ) < ERROR;
 }
 
@@ -30,7 +30,7 @@ std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& vec ) {
    return os;
 }
 
-std::ostream& operator<<( std::ostream& os, const std::vector<double>& vec ) {
+std::ostream& operator<<( std::ostream& os, const std::vector<EuclidianFloat>& vec ) {
    os << "[ ";
    for ( const auto& elem : vec ) {
       os << elem << " ";
@@ -113,17 +113,17 @@ void restore_permut( std::vector<unsigned>& retval, unsigned n, unsigned k, unsi
 
 // ----- Solving TSP
 
-double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
+EuclidianFloat solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
    // distance table
    if ( DEBUG_MODE ) {
       std::cout <<  "--- distances:" <<  std::endl;
    }
-   std::vector< std::vector<double>> distances = egraph.get_distance_table();
+   std::vector< std::vector<EuclidianFloat>> distances = egraph.get_distance_table();
 
-   std::vector< std::vector<double> > tablets;
+   std::vector< std::vector<EuclidianFloat> > tablets;
    {
       const unsigned permuts = BinomTablet[ egraph.n - 1 ][ 0 ];
-      std::vector<double> current( permuts * egraph.n, INF_VALUE );
+      std::vector<EuclidianFloat> current( permuts * egraph.n, INF_VALUE );
       assert( permuts == 1 );
       current[0] = 0;
 
@@ -142,7 +142,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
          curr_permut[i] = i;
       }
 
-      std::vector<double> current( permuts * egraph.n, 0.0 );
+      std::vector<EuclidianFloat> current( permuts * egraph.n, 0.0 );
       for ( unsigned s = 0; ; ++s ) {
          if ( DEBUG_MODE ) {
             std::cout << "--- " << s << " " << curr_permut << std::endl;
@@ -157,7 +157,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
          for ( unsigned j = 1; j < curr_permut.size(); ++j ) {
             unsigned previous_s = permut_number_with_skipping( curr_permut, egraph.n, j );
             for ( unsigned y = 0; y < egraph.n; ++y ) {
-               const double candidate = tablets[ tablets.size() - 1 ][ previous_s * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
+               const EuclidianFloat candidate = tablets[ tablets.size() - 1 ][ previous_s * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
                current[ s * egraph.n + curr_permut[j] ] =
                   std::min( current[ s * egraph.n + curr_permut[j] ], candidate );
             }
@@ -186,7 +186,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
    }
 
    // preparing for return
-   double retval = INF_VALUE;
+   EuclidianFloat retval = INF_VALUE;
    for ( unsigned i = 1; i < egraph.n; ++i ) {
       retval = std::min( retval, tablets[ tablets.size() - 1 ][ i ] + distances[i][0] ); // closing the Hamilton-cycle
    }
@@ -217,7 +217,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
       for ( unsigned m = egraph.n - 1; m > 0; --m ) {
          std::vector<unsigned> curr_permut;
          restore_permut( curr_permut, egraph.n, m + 1, s ); // restoring the set
-         const double min_value = tablets[m][ s * egraph.n + last_node ];
+         const EuclidianFloat min_value = tablets[m][ s * egraph.n + last_node ];
          if ( DEBUG_MODE ) {
             std::cout << "--- " << curr_permut << " " << last_node << " " << min_value << std::endl;
          }
@@ -239,7 +239,7 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
                std::cout << "=== " << pnumber << std::endl;
             }
             for ( unsigned y = 0; y < egraph.n; ++y ) {
-               const double candidate = tablets[ m - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
+               const EuclidianFloat candidate = tablets[ m - 1 ][ pnumber * egraph.n + y ] + distances[ y ][ curr_permut[j] ];
                if ( DEBUG_MODE ) {
                   std::cout << "=== === " << candidate << std::endl;
                }
@@ -271,14 +271,14 @@ double solve_tsp( const EuclidianGraph& egraph, std::vector<unsigned>& best_trav
 
 // --- Trying to speed up TSP solver with heuristics
 
-double solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
+EuclidianFloat solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& best_travel ) {
    // can be reduced?
    std::map<unsigned, unsigned> reductions; 
    std::map<unsigned, unsigned> inv_reductions; 
    for ( unsigned i = 0; i < egraph.n; ++i ) {
 
       // finding nearest neighbour
-      double nearest = ( i == 0 ) ? 1 : 0;
+      EuclidianFloat nearest = ( i == 0 ) ? 1 : 0;
       for ( unsigned x = 0; x < egraph.n; ++x ) {
          if ( x == i ) {
             continue;
@@ -288,8 +288,8 @@ double solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& be
          }
       }
 
-      double minDist = distance( egraph.coords[i], egraph.coords[nearest] );
-      double minImprovement = INF_VALUE; 
+      EuclidianFloat minDist = distance( egraph.coords[i], egraph.coords[nearest] );
+      EuclidianFloat minImprovement = INF_VALUE; 
 
       for ( unsigned x = 0; x < egraph.n; ++x ) {
          for ( unsigned y = x + 1; y < egraph.n; ++y ) {
@@ -356,14 +356,14 @@ double solve_tsp_tricky( const EuclidianGraph& egraph, std::vector<unsigned>& be
          }
       }
 
-      std::vector< std::vector<double>> distances = egraph.get_distance_table();
+      std::vector< std::vector<EuclidianFloat>> distances = egraph.get_distance_table();
 
       unsigned mini = 0;
-      double minlen = calculate_path_distance( best_travels[mini], distances );
+      EuclidianFloat minlen = calculate_path_distance( best_travels[mini], distances );
 
       unsigned num = best_travels.size();
       for ( unsigned i = 0; i < num; ++i ) {
-         const double len = calculate_path_distance( best_travels[i], distances );
+         const EuclidianFloat len = calculate_path_distance( best_travels[i], distances );
          if ( DEBUG_MODE ) {
             std::cout << len << " " << best_travels[i] << std::endl;
          }
@@ -430,7 +430,7 @@ int main( int argc, const char* argv[] ) {
       }
 
       std::vector<unsigned> best_travel;
-      const double solution = solve_tsp_tricky( egraph, best_travel );
+      const EuclidianFloat solution = solve_tsp_tricky( egraph, best_travel );
       std::cout << solution << std::endl;
       std::cout << best_travel << std::endl;
    }
