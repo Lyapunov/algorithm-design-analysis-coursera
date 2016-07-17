@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 
 #include "graph_euclidian.h"
 
@@ -106,15 +107,9 @@ void solve_tsp( const EuclidianGraph& egraph ) {
 
    std::vector< std::vector<double> > tablets;
    {
-      const unsigned permuts = BinomTablet[ egraph.n ][ 1 ];
+      const unsigned permuts = BinomTablet[ egraph.n - 1 ][ 0 ];
       std::vector<double> current( permuts * egraph.n, 0.0 );
-
-      // init A0
-      for ( unsigned s = 0; s < permuts; ++s ) {
-         for ( unsigned j = 0; j < egraph.n; ++j ) {
-            current[ s * egraph.n + j ] = ( s == 0 && j == 0 ? 0.0 : INF_VALUE );
-         }
-      }
+      assert( permuts == 1 );
 
       tablets.push_back( current );
    }
@@ -122,7 +117,7 @@ void solve_tsp( const EuclidianGraph& egraph ) {
    // main loop
    for ( unsigned m = 1; m < egraph.n; ++m ) {
       std::cout <<  "--- main loop "  << m << std::endl;
-      const unsigned permuts = BinomTablet[ egraph.n ][ m + 1 ];
+      const unsigned permuts = BinomTablet[ egraph.n - 1][ m  ];
       std::cout <<  "--- permuts: "  << permuts << std::endl;
       std::vector<unsigned> curr_permut( m + 1, 0 );
       for ( unsigned i = 0; i < curr_permut.size(); ++i ) {
@@ -143,7 +138,7 @@ void solve_tsp( const EuclidianGraph& egraph ) {
             curr_permut[ curr_permut.size() - 1 - pos + i] = curr_permut[ curr_permut.size() - 1 - pos + i - 1] + 1;
          }
          // sanity check, may terminate the loop
-         if ( curr_permut[ curr_permut.size() - 1] >= egraph.n ) {
+         if ( curr_permut[ 0 ] >= 1 ) {
             break;
          }
       }
