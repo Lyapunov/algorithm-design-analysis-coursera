@@ -9,7 +9,7 @@
 
 #include "kosaraju.h"
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 struct Clause {
    int first  = 0;
