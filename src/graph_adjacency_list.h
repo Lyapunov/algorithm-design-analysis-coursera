@@ -2,6 +2,7 @@
 #define GRAPH_ADJACENCY_LIST
 
 #include <cassert>
+#include <vector>
 
 #include "edge.h"
 #include "graph_edgelist.h"
@@ -109,6 +110,63 @@ bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
          --edge.second;
          retval.alist[number - 1].push_back( edge );
       }
+   }
+}
+
+bool readALGraphFromEdgeList( std::string filename, GraphAL& graph, int debugmode = 0 )
+{
+   std::ifstream is;
+   is.open( filename.c_str() );
+
+   // first line
+   std::string line;
+   if ( !std::getline( is, line ) ) {
+      return false;
+   }
+   std::istringstream ss(line);
+
+   GraphAL retval;
+   retval.n = 0;
+
+   if ( debugmode ) {
+      std::cout << "=== READING GRAPH()" << std::endl;
+   }
+
+   while (true) {
+      if ( !std::getline( is, line ) ) {
+         is.close();
+         if ( debugmode ) {
+            std::cout << "=== READ " << retval.n << " vertices" << std::endl;
+         }
+         graph = retval;
+         return true;
+      }
+      std::istringstream ss(line);
+      unsigned startv = 0;
+      unsigned endv   = 0;
+      int cost   = 1;
+      if ( !( ss >> startv ) ) {
+         return false;
+      }
+      if ( !( ss >> endv ) ) {
+         return false;
+      }
+      ss >> cost;
+
+      unsigned maxi = std::max( startv, endv );
+      if ( retval.alist.size() < maxi ) {
+         std::vector< std::vector<Edge> > extension( maxi - retval.alist.size(), std::vector<Edge>() );
+         retval.alist.insert( retval.alist.end(), extension.begin(), extension.end() );
+         retval.n = maxi;
+      }
+
+      Edge edge;
+      edge.first  = startv;
+      edge.second = endv;
+      edge.cost   = cost;
+      --edge.first;
+      --edge.second;
+      retval.alist[ edge.first ].push_back( edge );
    }
 }
 
