@@ -140,9 +140,26 @@ int main( int argc, const char* argv[] ) {
       if ( DEBUG_MODE ) {
          std::cout << problem << std::endl;
       }
+
       GraphAL imp = constructGraphALFromGraph( convertSat2ToGraph( problem ) );
       if ( DEBUG_MODE ) {
          std::cout << imp << std::endl;
       }
+
+      std::vector<unsigned> components = kosaraju( imp );
+      if ( DEBUG_MODE ) {
+         std::cout << components << std::endl;
+      }
+
+      // not satisfiable iff a variable's vertex and the vertex of its negation are
+      // in the same component
+      for ( unsigned i = 0; i < problem.n; ++i ) {
+         if ( components[i] == components[ problem.n + i] ) {
+            std::cout << "0" << std::endl;
+            return 1;
+         }
+      }
+      std::cout << "1" << std::endl;
+      return 1;
    }
 }
