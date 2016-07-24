@@ -141,6 +141,10 @@ int main( int argc, const char* argv[] ) {
          std::cout << problem << std::endl;
       }
 
+      if ( DEBUG_MODE ) {
+         std::cout << convertSat2ToGraph( problem ) << std::endl;
+      }
+
       GraphAL imp = constructGraphALFromGraph( convertSat2ToGraph( problem ) );
       if ( DEBUG_MODE ) {
          std::cout << imp << std::endl;
