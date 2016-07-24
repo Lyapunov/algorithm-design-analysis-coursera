@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <cassert>
+
 #include "kosaraju.h"
 
 static const int DEBUG_MODE = 1;
@@ -87,6 +89,38 @@ bool readSat2Problem( std::string filename, Sat2& sat2, int debugmode = 0 )
    }
 }
 
+unsigned convLiteralNumberToVertexNumber( int literal, unsigned n ) {
+   assert( literal );
+   if ( literal > 0 ) {
+      return static_cast<unsigned>( literal - 1 );  
+   } else {
+      return static_cast<unsigned>( n - 1 - literal );
+   }
+}
+
+Graph convertSat2ToGraph( const Sat2& sat2 ) {
+   // converting 1..n literals to a graph with vertices 0..(n-1) (positive), n..2n-1 (negative)
+   Graph retval;
+   retval.n = 2 * sat2.n;
+   for ( const auto& elem : sat2.clist ) {
+      // if the clause is x_a OR x_b, it boils down to two implications:
+      // ( neg x_a => x_b ) and ( neg x_b => x_a )
+      Edge a;
+      a.first  = convLiteralNumberToVertexNumber( -elem.first, sat2.n ) + 1;
+      a.second = convLiteralNumberToVertexNumber(  elem.second, sat2.n ) + 1;
+      a.cost = 1;
+      retval.edges.push_back( a );
+      Edge b;
+      b.first  = convLiteralNumberToVertexNumber( -elem.second, sat2.n ) + 1;
+      b.second = convLiteralNumberToVertexNumber(  elem.first, sat2.n ) + 1;
+      b.cost = 1;
+      retval.edges.push_back( b );
+   }
+   retval.m = retval.edges.size();
+
+   return retval;
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -106,6 +140,9 @@ int main( int argc, const char* argv[] ) {
       if ( DEBUG_MODE ) {
          std::cout << problem << std::endl;
       }
-
+      GraphAL imp = constructGraphALFromGraph( convertSat2ToGraph( problem ) );
+      if ( DEBUG_MODE ) {
+         std::cout << imp << std::endl;
+      }
    }
 }
