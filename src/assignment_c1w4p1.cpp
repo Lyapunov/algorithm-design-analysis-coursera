@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 
+#include <map>
+#include <set>
+
 #include "graph_adjacency_list.h"
 
 static const int DEBUG_MODE = 0;
@@ -100,9 +103,34 @@ int main( int argc, const char* argv[] ) {
       }
 
       std::vector<unsigned> result = kosaraju( graph );
+
       if ( DEBUG_MODE ) {
          std::cout << "=== Strongly connected compontent descriptor:" << std::endl;
          std::cout << "--- " << result << std::endl;
       }
+
+      std::map<unsigned, unsigned> component_sizes_by_representant;
+      for ( const auto& elem : result ) {
+         component_sizes_by_representant[ elem ]++; 
+      }
+
+      // http://stackoverflow.com/questions/22591645/cstd-map-key-with-descending-order
+      std::multiset<unsigned, std::greater<int>> component_sizes;
+      for ( const auto& elem : component_sizes_by_representant ) {
+         component_sizes.insert( elem.second );
+      }
+      unsigned counter = 0;
+      for ( const auto& elem : component_sizes ) {
+         std::cout << elem;
+
+         counter++;
+         if ( counter >= 5 ) {
+            break;
+         }
+         if ( counter < component_sizes.size() ) {
+            std::cout << ",";
+         }
+      }
+      std::cout << std::endl;
    }
 }
