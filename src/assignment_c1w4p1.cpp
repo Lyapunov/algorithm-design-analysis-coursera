@@ -7,7 +7,7 @@
 
 #include "graph_adjacency_list.h"
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& rhs ) {
    os << "vector<unsigned>( ";
@@ -95,7 +95,9 @@ int main( int argc, const char* argv[] ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
          return 1;
       }
-      std::cout << graph << std::endl;
+      if ( DEBUG_MODE ) {
+         std::cout << graph << std::endl;
+      }
 
       std::vector<unsigned> result = kosaraju( graph );
       if ( DEBUG_MODE ) {
