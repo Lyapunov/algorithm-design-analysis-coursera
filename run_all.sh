@@ -68,3 +68,10 @@ set -x
 ./app/assignment_c2w6p1 ./inputs/input_c2w6p1_test_1.txt
 ./app/assignment_c2w6p1 ./inputs/input_c2w6p1_test_2.txt
 ./app/assignment_c2w6p1 ./inputs/input_c2w6p1_test_3.txt
+./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_1.txt
+./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_2.txt
+./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_3.txt
+./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_4.txt
+./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_5.txt
+./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_6.txt
+
