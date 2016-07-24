@@ -118,20 +118,12 @@ bool readALGraphFromEdgeList( std::string filename, GraphAL& graph, int debugmod
    std::ifstream is;
    is.open( filename.c_str() );
 
-   // first line
-   std::string line;
-   if ( !std::getline( is, line ) ) {
-      return false;
-   }
-   std::istringstream ss(line);
-
-   GraphAL retval;
-   retval.n = 0;
-
    if ( debugmode ) {
       std::cout << "=== READING GRAPH()" << std::endl;
    }
 
+   GraphAL retval;
+   std::string line;
    while (true) {
       if ( !std::getline( is, line ) ) {
          is.close();
@@ -166,6 +158,9 @@ bool readALGraphFromEdgeList( std::string filename, GraphAL& graph, int debugmod
       edge.cost   = cost;
       --edge.first;
       --edge.second;
+      if ( debugmode ) {
+         std::cout << "--- inserting " << edge << std::endl;
+      }
       retval.alist[ edge.first ].push_back( edge );
    }
 }
