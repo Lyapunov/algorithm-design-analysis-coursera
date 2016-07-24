@@ -3,3 +3,4 @@ app
 *.o
 solutions.txt
 input_c2w4p1_large.txt
+input_c1w4p1_target.txt
