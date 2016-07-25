@@ -19,33 +19,71 @@ std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& rhs ) {
    return os;
 }
 
-class DfsLooper {
+class ComponentsWorker
+{
+public:
+   ComponentsWorker( unsigned size )
+    : representant_( 0 ),
+      components_( size, 0 )
+   {}
+
+   void workerBookRepresentant( unsigned subject ) {
+      representant_ = subject;
+   }
+
+   void workerBookSubject( unsigned subject ) {
+      components_[ subject ] = representant_;
+   }
+
+   std::vector<unsigned> getComponents() const { return components_; }
+private:
+   unsigned representant_; 
+   std::vector<unsigned> components_;
+};
+
+class EndingNumbersWorker
+{
+public:
+   EndingNumbersWorker( unsigned size )
+    : ending_counter_( 0 ),
+      endings_( size, 0 )
+   {}
+
+   void workerBookRepresentant( unsigned subject ) {}
+
+   void workerBookSubject( unsigned subject ) {
+      endings_[ending_counter_] = subject;
+      ending_counter_++;
+   }
+
+   std::vector<unsigned> getEndings() const { return endings_; }
+private:
+   unsigned ending_counter_;
+   std::vector<unsigned> endings_;
+};
+
+template <class T>
+class DfsLooper : public T {
 public:
    DfsLooper( const GraphAL& graph, const std::vector<unsigned>* startings = 0 )
-    : graph_( graph ),
-      visited_( graph.n, false ),
-      ending_counter_( 0 ),
-      representant_( 0 ),
-      endings_( graph.n, 0 ),
-      components_( graph.n, 0 )
+    : T( graph.n ),
+      graph_( graph ),
+      visited_( graph.n, false )
    {
       if ( startings ) {
          // reading backwards, amend to Kosaraju's algorithm
          for ( unsigned i = 0; i < startings->size(); ++i ) {
             unsigned elem = startings->operator[]( startings->size() - 1 - i );
-            representant_ = elem;
+            this->workerBookRepresentant( elem );
             dfs( elem );
          }
       } else {
          for ( unsigned i = 0; i < graph.n; ++i ) {
-            representant_ = i;
-            dfs( representant_ );
+            this->workerBookRepresentant( i );
+            dfs( i );
          }
       }
    }
-
-   std::vector<unsigned> getEndings() { return endings_; }
-   std::vector<unsigned> getComponents() { return components_; }
 
 private:
    void dfs( unsigned subject ) {
@@ -56,26 +94,20 @@ private:
       for ( const auto edge : graph_.alist[ subject ] ) {
          dfs( edge.second ); 
       }
-      endings_[ending_counter_] = subject;
-      components_[ subject ] = representant_;
-      ending_counter_++;
+      this->workerBookSubject( subject );
    }
 
    const GraphAL& graph_;
    std::vector<bool> visited_;
-   unsigned ending_counter_;
-   unsigned representant_; 
-   std::vector<unsigned> endings_;
-   std::vector<unsigned> components_;
 };
 
 // Kosaraju's algorithm to find strongly connected components
 
 std::vector<unsigned> kosaraju( const GraphAL& graph ) {
    const GraphAL inverted = graph.invert();
-   DfsLooper looper1( inverted );
+   DfsLooper<EndingNumbersWorker> looper1( inverted );
    std::vector<unsigned> magic = looper1.getEndings();
-   DfsLooper looper2( graph, &magic );
+   DfsLooper<ComponentsWorker> looper2( graph, &magic );
    return looper2.getComponents();
 }
 
