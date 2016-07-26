@@ -62,13 +62,54 @@ private:
    std::vector<unsigned> endings_;
 };
 
+// poor man's stack
+class PMStack {
+public:
+   PMStack( const unsigned n )
+    : storage_( n, 0 ),
+      pos_( 0 )
+   {}
+   
+   void push( unsigned n ) {
+      assert( pos_ < storage_.size() );
+      storage_[ pos_ ] = n;
+      ++pos_;
+   }
+
+   bool pop() {
+      if ( pos_ > 0 ) {
+         --pos_;
+         return true;
+      }
+      return false;
+   }
+   
+   bool empty() {
+      return pos_ == 0;
+   }
+
+   bool get( unsigned& n ) const {
+      if ( pos_ > 0 ) {
+         n = storage_[ pos_ - 1 ];
+         return true;
+      }
+      return false;
+   }
+
+private:
+   std::vector<unsigned> storage_;
+   unsigned pos_;
+};
+
 template <class T>
 class DfsLooper : public T {
 public:
    DfsLooper( const GraphAL& graph, const std::vector<unsigned>* startings = 0 )
     : T( graph.n ),
       graph_( graph ),
-      visited_( graph.n, false )
+      visited_( graph.n, false ),
+      pmStack_( graph.n ),
+      counters_( graph.n, 0 )
    {
       if ( startings ) {
          // reading backwards, amend to Kosaraju's algorithm
@@ -76,16 +117,19 @@ public:
             unsigned elem = startings->operator[]( startings->size() - 1 - i );
             this->workerBookRepresentant( elem );
             dfs( elem );
+//            iterativeDfs( elem );
          }
       } else {
          for ( unsigned i = 0; i < graph.n; ++i ) {
             this->workerBookRepresentant( i );
             dfs( i );
+//            iterativeDfs( i );
          }
       }
    }
 
 private:
+   // recursive solutiion
    void dfs( unsigned subject ) {
       if ( visited_[subject] ) {
          return;
@@ -97,8 +141,35 @@ private:
       this->workerBookSubject( subject );
    }
 
+   // iterative solution
+   void iterativeDfs( unsigned subject ) {
+      if ( !visited_[subject] ) {
+         visited_[subject] = true;
+         pmStack_.push( subject );
+      }
+
+      unsigned current = subject;
+      while ( !pmStack_.empty() ) {
+         if ( counters_[ current ] < graph_.alist[ current ].size() ) {
+            unsigned neighbour = graph_.alist[ current ][ counters_[ current ]++ ].second;
+            if ( !visited_[neighbour] ) {
+               visited_[neighbour] = true;
+               pmStack_.push( neighbour );
+               current = neighbour;
+            }
+         } else {
+            // ending!
+            this->workerBookSubject( current );
+            pmStack_.pop();
+            pmStack_.get( current );
+         }
+      }
+   }
+
    const GraphAL& graph_;
    std::vector<bool> visited_;
+   PMStack pmStack_;
+   std::vector<unsigned> counters_;
 };
 
 // Kosaraju's algorithm to find strongly connected components
