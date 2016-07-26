@@ -66,13 +66,12 @@ private:
 class PMStack {
 public:
    PMStack( const unsigned n )
-    : storage_( n, 0 ),
+    : storage_( n, std::pair<unsigned, unsigned>(0, 0 ) ),
       pos_( 0 )
    {}
    
-   void push( unsigned n ) {
-      assert( pos_ < storage_.size() );
-      storage_[ pos_ ] = n;
+   void push( const std::pair<unsigned, unsigned>&& value ) {
+      storage_[ pos_ ] = value;
       ++pos_;
    }
 
@@ -88,16 +87,16 @@ public:
       return pos_ == 0;
    }
 
-   bool get( unsigned& n ) const {
+   bool get( std::pair<unsigned, unsigned>** ptr ) {
       if ( pos_ > 0 ) {
-         n = storage_[ pos_ - 1 ];
+         *ptr = &storage_[ pos_ - 1 ];
          return true;
       }
       return false;
    }
 
 private:
-   std::vector<unsigned> storage_;
+   std::vector<std::pair<unsigned, unsigned>> storage_;
    unsigned pos_;
 };
 
@@ -108,22 +107,21 @@ public:
     : T( graph.n ),
       graph_( graph ),
       visited_( graph.n, false ),
-      pmStack_( graph.n ),
-      counters_( graph.n, 0 )
+      pmStack_( graph.n )
    {
       if ( startings ) {
          // reading backwards, amend to Kosaraju's algorithm
          for ( unsigned i = 0; i < startings->size(); ++i ) {
             unsigned elem = startings->operator[]( startings->size() - 1 - i );
             this->workerBookRepresentant( elem );
-            dfs( elem );
-//            iterativeDfs( elem );
+//            dfs( elem );
+            iterativeDfs( elem );
          }
       } else {
          for ( unsigned i = 0; i < graph.n; ++i ) {
             this->workerBookRepresentant( i );
-            dfs( i );
-//            iterativeDfs( i );
+//            dfs( i );
+            iterativeDfs( i );
          }
       }
    }
@@ -145,23 +143,24 @@ private:
    void iterativeDfs( unsigned subject ) {
       if ( !visited_[subject] ) {
          visited_[subject] = true;
-         pmStack_.push( subject );
+         pmStack_.push( std::pair<unsigned, unsigned>( subject, graph_.alist[ subject ].size() ) );
       }
 
-      unsigned current = subject;
+      std::pair< unsigned, unsigned>* pCurrent;
+      pmStack_.get( &pCurrent );
       while ( !pmStack_.empty() ) {
-         if ( counters_[ current ] < graph_.alist[ current ].size() ) {
-            unsigned neighbour = graph_.alist[ current ][ counters_[ current ]++ ].second;
+         if ( pCurrent->second > 0 ) {
+            unsigned neighbour = graph_.alist[ pCurrent->first ][ --pCurrent->second ].second;
             if ( !visited_[neighbour] ) {
                visited_[neighbour] = true;
-               pmStack_.push( neighbour );
-               current = neighbour;
+               pmStack_.push( std::pair<unsigned, unsigned>( neighbour, graph_.alist[ neighbour ].size() ) );
+               pmStack_.get( &pCurrent );
             }
          } else {
             // ending!
-            this->workerBookSubject( current );
+            this->workerBookSubject( pCurrent->first );
             pmStack_.pop();
-            pmStack_.get( current );
+            pmStack_.get( &pCurrent );
          }
       }
    }
@@ -169,7 +168,6 @@ private:
    const GraphAL& graph_;
    std::vector<bool> visited_;
    PMStack pmStack_;
-   std::vector<unsigned> counters_;
 };
 
 // Kosaraju's algorithm to find strongly connected components
