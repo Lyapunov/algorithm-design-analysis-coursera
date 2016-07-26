@@ -10,6 +10,8 @@
 
 #include "graph_adjacency_list.h"
 
+#define ITERATIVE 0
+
 std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& rhs ) {
    os << "vector<unsigned>( ";
    for ( const auto elem: rhs ) {
@@ -107,21 +109,27 @@ public:
     : T( graph.n ),
       graph_( graph ),
       visited_( graph.n, false ),
-      pmStack_( graph.n )
+      pmStack_( ITERATIVE ? graph.n : 0 )
    {
       if ( startings ) {
          // reading backwards, amend to Kosaraju's algorithm
          for ( unsigned i = 0; i < startings->size(); ++i ) {
             unsigned elem = startings->operator[]( startings->size() - 1 - i );
             this->workerBookRepresentant( elem );
-//            dfs( elem );
-            iterativeDfs( elem );
+            if ( !ITERATIVE ) {
+               dfs( elem );
+            } else {
+               iterativeDfs( elem );
+            }
          }
       } else {
          for ( unsigned i = 0; i < graph.n; ++i ) {
             this->workerBookRepresentant( i );
-//            dfs( i );
-            iterativeDfs( i );
+            if ( !ITERATIVE ) {
+               dfs( i );
+            } else {
+               iterativeDfs( i );
+            }
          }
       }
    }
