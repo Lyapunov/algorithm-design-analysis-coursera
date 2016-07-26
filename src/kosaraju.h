@@ -149,13 +149,16 @@ private:
       std::pair< unsigned, unsigned>* pCurrent;
       pmStack_.get( &pCurrent );
       while ( !pmStack_.empty() ) {
+         unsigned neighbour ;
+         while ( pCurrent->second > 0 && visited_[ neighbour = graph_.alist[ pCurrent->first ][ pCurrent->second - 1 ].second ] ) {
+            --pCurrent->second;
+         }
+
          if ( pCurrent->second > 0 ) {
-            unsigned neighbour = graph_.alist[ pCurrent->first ][ --pCurrent->second ].second;
-            if ( !visited_[neighbour] ) {
-               visited_[neighbour] = true;
-               pmStack_.push( std::pair<unsigned, unsigned>( neighbour, graph_.alist[ neighbour ].size() ) );
-               pmStack_.get( &pCurrent );
-            }
+            --pCurrent->second;
+            visited_[neighbour] = true;
+            pmStack_.push( std::pair<unsigned, unsigned>( neighbour, graph_.alist[ neighbour ].size() ) );
+            pmStack_.get( &pCurrent );
          } else {
             // ending!
             this->workerBookSubject( pCurrent->first );
