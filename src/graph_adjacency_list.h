@@ -13,9 +13,7 @@ struct GraphAL {
    GraphAL invert() const {
       GraphAL retval;
       retval.n = this->n;
-      for ( unsigned i = 0; i < this->n; ++i ) {
-         retval.alist.push_back( std::vector<Edge>() );
-      }
+      retval.alist = std::vector< std::vector<Edge> >( retval.n, std::vector<Edge>() );
       for ( const auto& inlist : this->alist ) {
          for ( const auto& elem : inlist ) {
             Edge inverted;
@@ -43,6 +41,33 @@ struct GraphAL {
       --edge.first;
       --edge.second;
       alist[ edge.first ].push_back( edge );
+   }
+};
+
+struct LightweightGraphAL {
+   unsigned n = 0;
+   std::vector< std::vector<unsigned> > alist;
+   LightweightGraphAL invert() const {
+      LightweightGraphAL retval;
+      retval.n = this->n;
+      retval.alist = std::vector< std::vector<unsigned> >( retval.n, std::vector<unsigned>() );
+      for ( unsigned i = 0; i < this->n; ++i ) {
+         const auto& inlist = this->alist[i];
+         for ( const auto& elem : inlist ) {
+            retval.alist[ elem ].push_back( i );
+         }
+      }
+      return retval;
+   }
+   void addEdge( unsigned startv, unsigned endv, unsigned cost ) {
+      unsigned maxi = std::max( startv, endv );
+      if ( alist.size() < maxi ) {
+         std::vector< std::vector<unsigned> > extension( maxi - alist.size(), std::vector<unsigned>() );
+         alist.insert( alist.end(), extension.begin(), extension.end() );
+         n = maxi;
+      }
+
+      alist[ startv - 1 ].push_back( endv - 1 );
    }
 };
 
