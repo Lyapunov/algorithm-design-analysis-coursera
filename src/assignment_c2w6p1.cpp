@@ -114,6 +114,27 @@ Graph convertSat2ToGraph( const Sat2& sat2 ) {
    return retval;
 }
 
+template <class GraphRepresentation = GraphAL>
+GraphRepresentation convertSat2ToGraphAL( const Sat2& sat2 ) {
+   GraphRepresentation retval;
+   retval.n = 2 * sat2.n;
+   for ( const auto& elem : sat2.clist ) {
+      // if the clause is x_a OR x_b, it boils down to two implications:
+      // ( neg x_a => x_b ) and ( neg x_b => x_a )
+      retval.addEdge(
+         convLiteralNumberToVertexNumber( -elem.first, sat2.n ) + 1,
+         convLiteralNumberToVertexNumber(  elem.second, sat2.n ) + 1,
+         1 );
+      retval.addEdge(
+         convLiteralNumberToVertexNumber( -elem.second, sat2.n ) + 1,
+         convLiteralNumberToVertexNumber(  elem.first, sat2.n ) + 1,
+         1 );
+   }
+
+   return retval;
+
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -134,11 +155,7 @@ int main( int argc, const char* argv[] ) {
          std::cout << problem << std::endl;
       }
 
-      if ( DEBUG_MODE ) {
-         std::cout << convertSat2ToGraph( problem ) << std::endl;
-      }
-
-      GraphAL imp = constructGraphALFromGraph( convertSat2ToGraph( problem ) );
+      GraphAL imp = convertSat2ToGraphAL( problem );
       if ( DEBUG_MODE ) {
          std::cout << imp << std::endl;
       }
