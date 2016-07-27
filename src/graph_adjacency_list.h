@@ -27,6 +27,9 @@ struct GraphAL {
       }
       return retval;
    }
+   void init( unsigned n ) {
+      alist = std::vector< std::vector<Edge> >( n );
+   }
    void addEdge( unsigned startv, unsigned endv, unsigned cost ) {
       unsigned maxi = std::max( startv, endv );
       if ( alist.size() < maxi ) {
@@ -65,6 +68,9 @@ struct LightweightGraphAL {
          }
       }
       return retval;
+   }
+   void init( unsigned n ) {
+      alist = std::vector< std::vector<unsigned> >( n );
    }
    void addEdge( unsigned startv, unsigned endv, unsigned cost ) {
       unsigned maxi = std::max( startv, endv );
