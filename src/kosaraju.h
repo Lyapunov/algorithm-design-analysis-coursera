@@ -141,8 +141,8 @@ private:
          return;
       }
       visited_[subject] = true;
-      for ( unsigned i = 0; i < graph_.alist[ subject ].size(); ++i ) {
-         dfs( graph_.alist[ subject ][ i ].second ); 
+      for ( unsigned i = 0; i < graph_.numOfOutEdges( subject ); ++i ) {
+         dfs( graph_.ithOutEdge( subject, i ) ); 
       }
       this->workerBookSubject( subject );
    }
@@ -151,21 +151,21 @@ private:
    void iterativeDfs( unsigned subject ) {
       if ( !visited_[subject] ) {
          visited_[subject] = true;
-         pmStack_.push( std::pair<unsigned, unsigned>( subject, graph_.alist[ subject ].size() ) );
+         pmStack_.push( std::pair<unsigned, unsigned>( subject, graph_.numOfOutEdges( subject ) ) );
       }
 
       std::pair< unsigned, unsigned>* pCurrent;
       pmStack_.get( &pCurrent );
       while ( !pmStack_.empty() ) {
          unsigned neighbour ;
-         while ( pCurrent->second > 0 && visited_[ neighbour = graph_.alist[ pCurrent->first ][ pCurrent->second - 1 ].second ] ) {
+         while ( pCurrent->second > 0 && visited_[ neighbour = graph_.ithOutEdge( pCurrent->first, pCurrent->second - 1 ) ] ) {
             --pCurrent->second;
          }
 
          if ( pCurrent->second > 0 ) {
             --pCurrent->second;
             visited_[neighbour] = true;
-            pmStack_.push( std::pair<unsigned, unsigned>( neighbour, graph_.alist[ neighbour ].size() ) );
+            pmStack_.push( std::pair<unsigned, unsigned>( neighbour, graph_.numOfOutEdges( neighbour ) ) );
             pmStack_.get( &pCurrent );
          } else {
             // ending!
