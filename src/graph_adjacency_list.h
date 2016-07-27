@@ -28,6 +28,22 @@ struct GraphAL {
       }
       return retval;
    }
+   void addEdge( unsigned startv, unsigned endv, unsigned cost ) {
+      unsigned maxi = std::max( startv, endv );
+      if ( alist.size() < maxi ) {
+         std::vector< std::vector<Edge> > extension( maxi - alist.size(), std::vector<Edge>() );
+         alist.insert( alist.end(), extension.begin(), extension.end() );
+         n = maxi;
+      }
+
+      Edge edge;
+      edge.first  = startv;
+      edge.second = endv;
+      edge.cost   = cost;
+      --edge.first;
+      --edge.second;
+      alist[ edge.first ].push_back( edge );
+   }
 };
 
 GraphAL constructGraphALFromGraph( const Graph& graph ) {
@@ -145,23 +161,7 @@ bool readALGraphFromEdgeList( std::string filename, GraphAL& graph, int debugmod
       }
       ss >> cost;
 
-      unsigned maxi = std::max( startv, endv );
-      if ( retval.alist.size() < maxi ) {
-         std::vector< std::vector<Edge> > extension( maxi - retval.alist.size(), std::vector<Edge>() );
-         retval.alist.insert( retval.alist.end(), extension.begin(), extension.end() );
-         retval.n = maxi;
-      }
-
-      Edge edge;
-      edge.first  = startv;
-      edge.second = endv;
-      edge.cost   = cost;
-      --edge.first;
-      --edge.second;
-      if ( debugmode ) {
-         std::cout << "--- inserting " << edge << std::endl;
-      }
-      retval.alist[ edge.first ].push_back( edge );
+      retval.addEdge( startv, endv, cost );
    }
 }
 
