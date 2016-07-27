@@ -180,8 +180,8 @@ bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
    }
 }
 
-template < class T = GraphAL >
-bool readALGraphFromEdgeList( std::string filename, T& graph, int debugmode = 0 )
+template < class GraphRepresentant = GraphAL >
+bool readALGraphFromEdgeList( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
 {
    std::ifstream is;
    is.open( filename.c_str() );
@@ -190,7 +190,7 @@ bool readALGraphFromEdgeList( std::string filename, T& graph, int debugmode = 0 
       std::cout << "=== READING GRAPH()" << std::endl;
    }
 
-   T retval;
+   GraphRepresentant retval;
    std::string line;
    while (true) {
       if ( !std::getline( is, line ) ) {
