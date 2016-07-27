@@ -141,8 +141,8 @@ private:
          return;
       }
       visited_[subject] = true;
-      for ( const auto edge : graph_.alist[ subject ] ) {
-         dfs( edge.second ); 
+      for ( unsigned i = 0; i < graph_.alist[ subject ].size(); ++i ) {
+         dfs( graph_.alist[ subject ][ i ].second ); 
       }
       this->workerBookSubject( subject );
    }
