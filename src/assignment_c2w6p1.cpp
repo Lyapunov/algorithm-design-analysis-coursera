@@ -155,7 +155,7 @@ int main( int argc, const char* argv[] ) {
          std::cout << problem << std::endl;
       }
 
-      GraphAL imp = convertSat2ToGraphAL( problem );
+      LightweightGraphAL imp = convertSat2ToGraphAL<LightweightGraphAL>( problem );
       if ( DEBUG_MODE ) {
          std::cout << imp << std::endl;
       }
