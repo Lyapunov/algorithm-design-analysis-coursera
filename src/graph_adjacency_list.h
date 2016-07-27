@@ -2,6 +2,7 @@
 #define GRAPH_ADJACENCY_LIST
 
 #include <cassert>
+#include <limits>
 #include <vector>
 
 #include "edge.h"
@@ -212,7 +213,41 @@ bool readALGraphFromEdgeList( std::string filename, GraphRepresentant& graph, in
          return false;
       }
       ss >> cost;
+      retval.addEdge( startv, endv, cost );
+   }
+}
 
+template < class GraphRepresentant = GraphAL >
+bool fasterReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
+{
+   std::ifstream is;
+   is.open( filename.c_str() );
+   is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+   if ( debugmode ) {
+      std::cout << "=== READING GRAPH()" << std::endl;
+   }
+
+   GraphRepresentant retval;
+   std::string line;
+   while (true) {
+      if ( !is ) {
+         is.close();
+         if ( debugmode ) {
+            std::cout << "=== READ " << retval.n << " vertices" << std::endl;
+         }
+         graph = retval;
+         return true;
+      }
+      unsigned startv = 0;
+      unsigned endv   = 0;
+      int cost   = 1;
+      if ( !( is >> startv ) ) {
+         continue;
+      }
+      if ( !( is >> endv ) ) {
+         continue;
+      }
       retval.addEdge( startv, endv, cost );
    }
 }
