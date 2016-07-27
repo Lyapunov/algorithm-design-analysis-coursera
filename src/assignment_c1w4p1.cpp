@@ -22,7 +22,7 @@ int main( int argc, const char* argv[] ) {
       std::cout << "USAGE: " << basename( argv[0] ) << " <filename> " << std::endl;
       return 0;
    } else{ 
-      GraphAL graph;
+      LightweightGraphAL graph;
       std::string filename = argv[1];
       if ( !readALGraphFromEdgeList( filename, graph, DEBUG_MODE ) ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
