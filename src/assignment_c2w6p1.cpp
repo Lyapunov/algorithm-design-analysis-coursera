@@ -54,15 +54,9 @@ bool readSat2Problem( std::string filename, Sat2& sat2, int debugmode = 0 )
    std::ifstream is;
    is.open( filename.c_str() );
 
-   std::string line;
-   if ( !std::getline( is, line ) ) {
-      return false;
-   }
-   std::istringstream ss(line);
-
    Sat2 retval;
 
-   if ( !(ss >> retval.n ) ) {
+   if ( !(is >> retval.n ) ) {
       return false;
    }
 
@@ -71,18 +65,17 @@ bool readSat2Problem( std::string filename, Sat2& sat2, int debugmode = 0 )
    }
 
    while (true) {
-      if ( !std::getline( is, line ) ) {
+      if ( !is ) {
          is.close();
          sat2 = retval;
          return true;
       }
-      std::istringstream ss(line);
       Clause current;
-      if ( !(ss >> current.first ) ) {
-         return false;
+      if ( !(is >> current.first ) ) {
+         continue;
       }
-      if ( !(ss >> current.second ) ) {
-         return false;
+      if ( !(is >> current.second ) ) {
+         continue;
       }
 
       retval.clist.push_back( current );
