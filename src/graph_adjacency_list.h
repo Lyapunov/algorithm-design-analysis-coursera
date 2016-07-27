@@ -46,7 +46,7 @@ struct GraphAL {
       return this->alist[ subject ].size();
    }
    unsigned ithOutEdge( unsigned subject, unsigned i ) const {
-      return this->alist[ subject ][ i ].second;
+      return this->alist[ subject ][ i ];
    }
 };
 
@@ -75,6 +75,13 @@ struct LightweightGraphAL {
 
       alist[ startv - 1 ].push_back( endv - 1 );
    }
+   unsigned numOfOutEdges( unsigned subject ) const {
+      return this->alist[ subject ].size();
+   }
+   unsigned ithOutEdge( unsigned subject, unsigned i ) const {
+      return this->alist[ subject ][ i ].second;
+   }
+
 };
 
 GraphAL constructGraphALFromGraph( const Graph& graph ) {
