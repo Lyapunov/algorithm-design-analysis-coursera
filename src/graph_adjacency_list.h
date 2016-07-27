@@ -222,7 +222,6 @@ bool fasterReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepres
 {
    std::ifstream is;
    is.open( filename.c_str() );
-   is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
    if ( debugmode ) {
       std::cout << "=== READING GRAPH()" << std::endl;
