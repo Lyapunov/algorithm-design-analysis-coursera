@@ -102,11 +102,11 @@ private:
    unsigned pos_;
 };
 
-template <class T>
-class DfsLooper : public T {
+template <class Worker, class GraphRepresentant = GraphAL>
+class DfsLooper : public Worker {
 public:
-   DfsLooper( const GraphAL& graph, const std::vector<unsigned>* startings = 0 )
-    : T( graph.n ),
+   DfsLooper( const GraphRepresentant& graph, const std::vector<unsigned>* startings = 0 )
+    : Worker( graph.n ),
       graph_( graph ),
       visited_( graph.n, false ),
       pmStack_( ITERATIVE ? graph.n : 0 )
@@ -176,15 +176,16 @@ private:
       }
    }
 
-   const GraphAL& graph_;
+   const GraphRepresentant& graph_;
    std::vector<bool> visited_;
    PMStack pmStack_;
 };
 
 // Kosaraju's algorithm to find strongly connected components
 
-std::vector<unsigned> kosaraju( const GraphAL& graph ) {
-   const GraphAL inverted = graph.invert();
+template <class GraphRepresentant = GraphAL>
+std::vector<unsigned> kosaraju( const GraphRepresentant& graph ) {
+   const GraphRepresentant inverted = graph.invert();
    DfsLooper<EndingNumbersWorker> looper1( inverted );
    std::vector<unsigned> magic = looper1.getEndings();
    DfsLooper<ComponentsWorker> looper2( graph, &magic );

@@ -46,7 +46,7 @@ struct GraphAL {
       return this->alist[ subject ].size();
    }
    unsigned ithOutEdge( unsigned subject, unsigned i ) const {
-      return this->alist[ subject ][ i ];
+      return this->alist[ subject ][ i ].second;
    }
 };
 
@@ -79,7 +79,7 @@ struct LightweightGraphAL {
       return this->alist[ subject ].size();
    }
    unsigned ithOutEdge( unsigned subject, unsigned i ) const {
-      return this->alist[ subject ][ i ].second;
+      return this->alist[ subject ][ i ];
    }
 
 };
