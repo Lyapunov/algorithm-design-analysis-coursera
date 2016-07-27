@@ -113,6 +113,19 @@ std::ostream& operator<<( std::ostream& os, const GraphAL& graph ) {
    return os;
 }
 
+std::ostream& operator<<( std::ostream& os, const LightweightGraphAL& graph ) {
+   os << "LightweightGraphAL( " << graph.n << std::endl;
+   for ( unsigned i = 0; i < graph.alist.size(); ++i ) {
+      os << "--- " << i << ": ";
+      for ( const auto& elem : graph.alist[i] ) {
+         os << elem << " ";
+      }
+      os << std::endl;
+   }
+   os << ")";
+   return os;
+}
+
 bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
 {
    std::ifstream is;

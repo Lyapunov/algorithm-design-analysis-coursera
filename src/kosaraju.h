@@ -186,9 +186,9 @@ private:
 template <class GraphRepresentant = GraphAL>
 std::vector<unsigned> kosaraju( const GraphRepresentant& graph ) {
    const GraphRepresentant inverted = graph.invert();
-   DfsLooper<EndingNumbersWorker> looper1( inverted );
+   DfsLooper<EndingNumbersWorker, GraphRepresentant> looper1( inverted );
    std::vector<unsigned> magic = looper1.getEndings();
-   DfsLooper<ComponentsWorker> looper2( graph, &magic );
+   DfsLooper<ComponentsWorker, GraphRepresentant> looper2( graph, &magic );
    return looper2.getComponents();
 }
 
