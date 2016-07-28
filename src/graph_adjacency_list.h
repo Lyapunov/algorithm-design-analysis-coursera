@@ -4,6 +4,7 @@
 #include <cassert>
 #include <limits>
 #include <vector>
+#include <cstdio>
 
 #include "edge.h"
 #include "graph_edgelist.h"
@@ -255,6 +256,38 @@ bool fasterReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepres
       }
       retval.addEdge( startv, endv, cost );
    }
+}
+
+template < class GraphRepresentant = GraphAL >
+bool cStyleReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
+{
+   std::ifstream is;
+   is.open( filename.c_str() );
+
+   FILE* file = fopen( filename.c_str(), "r" );
+
+   if ( !file ) {
+      return false;
+   }
+
+   if ( debugmode ) {
+      std::cout << "=== READING GRAPH()" << std::endl;
+   }
+
+   GraphRepresentant retval;
+   unsigned startv = 0;
+   unsigned endv = 0;
+
+   while ( fscanf( file, "%u %u", &startv, &endv ) != EOF ) {
+      retval.addEdge( startv, endv, 1 );
+   }
+   fclose( file );
+
+   if ( debugmode ) {
+      std::cout << "=== READ " << retval.n << " vertices" << std::endl;
+   }
+   graph = retval;
+   return true;
 }
 
 #endif /*GRAPH_ADJACENCY_LIST*/
