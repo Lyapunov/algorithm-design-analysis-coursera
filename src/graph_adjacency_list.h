@@ -261,9 +261,6 @@ bool fasterReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepres
 template < class GraphRepresentant = GraphAL >
 bool cStyleReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
 {
-   std::ifstream is;
-   is.open( filename.c_str() );
-
    FILE* file = fopen( filename.c_str(), "r" );
 
    if ( !file ) {
