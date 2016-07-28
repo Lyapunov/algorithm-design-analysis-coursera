@@ -24,7 +24,9 @@ int main( int argc, const char* argv[] ) {
    } else{ 
       LightweightGraphAL graph;
       std::string filename = argv[1];
-      if ( !fasterReadALGraphFromEdgeListWithoutCost( filename, graph, DEBUG_MODE ) ) {
+//      if ( !cStyleReadALGraphFromEdgeListWithoutCost( filename, graph, DEBUG_MODE ) ) {
+//      if ( !fasterReadALGraphFromEdgeListWithoutCost( filename, graph, DEBUG_MODE ) ) {
+      if ( !shamelessReadALGraphFromEdgeListWithoutCost( filename, graph, DEBUG_MODE ) ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
          return 1;
       }

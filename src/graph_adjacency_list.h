@@ -224,6 +224,39 @@ bool readALGraphFromEdgeList( std::string filename, GraphRepresentant& graph, in
    }
 }
 
+// ----------------- Attempts to speed up input file reading
+
+// They say it is fast, but isn't, 2.6 secs on the largest input
+template < class GraphRepresentant = GraphAL >
+bool cStyleReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
+{
+   FILE* file = fopen( filename.c_str(), "r" );
+
+   if ( !file ) {
+      return false;
+   }
+
+   if ( debugmode ) {
+      std::cout << "=== READING GRAPH()" << std::endl;
+   }
+
+   GraphRepresentant retval;
+   unsigned startv = 0;
+   unsigned endv = 0;
+
+   while ( fscanf( file, "%u %u", &startv, &endv ) != EOF ) {
+      retval.addEdge( startv, endv, 1 );
+   }
+   fclose( file );
+
+   if ( debugmode ) {
+      std::cout << "=== READ " << retval.n << " vertices" << std::endl;
+   }
+   graph = retval;
+   return true;
+}
+
+// Slightly faster, 2.3 secs on the largest input
 template < class GraphRepresentant = GraphAL >
 bool fasterReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
 {
@@ -258,14 +291,12 @@ bool fasterReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepres
    }
 }
 
+// Currently it is the fastest version, 1.4 secs on the largest input
 template < class GraphRepresentant = GraphAL >
-bool cStyleReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
+bool shamelessReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
 {
-   FILE* file = fopen( filename.c_str(), "r" );
-
-   if ( !file ) {
-      return false;
-   }
+   std::ifstream is;
+   is.open( filename.c_str() );
 
    if ( debugmode ) {
       std::cout << "=== READING GRAPH()" << std::endl;
@@ -273,16 +304,47 @@ bool cStyleReadALGraphFromEdgeListWithoutCost( std::string filename, GraphRepres
 
    GraphRepresentant retval;
    unsigned startv = 0;
-   unsigned endv = 0;
+   int item = 0;
 
-   while ( fscanf( file, "%u %u", &startv, &endv ) != EOF ) {
-      retval.addEdge( startv, endv, 1 );
-   }
-   fclose( file );
+   bool odd = true;
+   bool num = true;
+   char buf[2048];
 
-   if ( debugmode ) {
-      std::cout << "=== READ " << retval.n << " vertices" << std::endl;
-   }
+   do
+   {
+      is.read(buf, sizeof(buf));
+      int k = is.gcount();
+      for (int i = 0; i < k; ++i)
+      {
+          switch (buf[i])
+          {
+              case '\r':
+              case '\n':
+              case ' ':
+                  if ( num ) {
+                     if ( odd ) {
+                        startv = item;
+                     } else {
+                        retval.addEdge( startv, item, 1 );
+                     }
+                     odd = !odd;
+                     item = 0;
+                     num = false;
+                  }
+                  break;
+              case '0': case '1': case '2': case '3':
+              case '4': case '5': case '6': case '7':
+              case '8': case '9':
+                  num = true;
+                  item = 10*item + buf[i] - '0';
+                  break;
+              default:
+                  std::cout << "Bad format" << std::endl;
+          }    
+      }
+   } while ( is );
+
+   is.close();
    graph = retval;
    return true;
 }
