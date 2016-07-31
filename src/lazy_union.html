@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+      <style>
+         body {
+            margin : 0px;
+            padding: 0px;
+         }
+      </style>
+   </head>
+   <body>
+   	<canvas id="canvas" width="500" height="500">
+      Your browser doesn't support html5 canvas.
+      </canvas>
+      <script>
+         var mainItem     = document.getElementById('canvas');
+         var context      = mainItem.getContext('2d');
+
+         var screenWidth  = mainItem.width  = window.innerWidth  - 20;
+         var screenHeight = mainItem.height = window.innerHeight - 20;
+         var screenScale  = Math.min( screenWidth, screenHeight ) / 2;
+
+         var fps = 25;
+         var ANIMATION;
+
+         var alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+         var nodeTexts = alphabets.split("");
+
+         function drawBackground() {
+            context.fillStyle = "black";
+            context.fillRect(0,0,screenWidth,screenHeight);
+         }
+
+         function getPixel( coords ) {
+            return [ screenWidth / 2 + coords[0] * screenScale, screenHeight / 2 + coords[1] * screenScale ];
+         }
+
+         function getColor( rgb ) {
+            return "#"+( rgb[0] ).toString(16) + ( rgb[1] ).toString(16) + ( rgb[2] ).toString(16);
+         }
+
+         function drawCircle( center, radius, rgb ) {
+            pxy = getPixel( center );
+            context.strokeStyle = getColor( rgb );
+            context.beginPath();
+            context.arc( pxy[0], pxy[1], radius * screenScale, 0, 2 * Math.PI, false );
+            context.closePath();
+
+            context.lineWidth = 2;
+            context.stroke();
+         }
+
+         function drawText( center, text, rgb ) {
+            pxy = getPixel( center );
+            context.lineWidth = 1;
+            context.font = "10pt arial";
+            context.strokeStyle = getColor( rgb );
+            context.strokeText( text, pxy[0] - 4, pxy[1] + 3 );
+         }
+
+         function drawNode( center, text ) {
+            drawCircle( center, 0.05, [0, 15, 0] );
+            drawText  ( center, text, [15,15, 0] );
+         }
+
+         // common functions 
+         function drawScene() {
+            setTimeout( function() {
+               drawBackground();
+               for ( var i = 0; i < 25; ++i ) {
+                  drawNode( [0.12 * i - 1.44,0], nodeTexts[i] );
+               }
+               ANIMATION = requestAnimationFrame(drawScene);
+            }, 1000 / fps );
+         }
+
+         function initCanvas() {
+            screenWidth  = mainItem.width  = window.innerWidth  - 20;
+            screenHeight = mainItem.height = window.innerHeight - 20;
+            screenScale  = Math.min( screenWidth, screenHeight ) / 2;
+
+            // starting the engine only if it is not running
+            if ( !ANIMATION ) {
+               drawScene();
+            }
+         }
+
+         //init
+         (function() {
+            initCanvas();
+            addEventListener('resize', initCanvas, false);
+         })();
+      </script>
+   </body>
+</html>
