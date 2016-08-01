@@ -109,8 +109,28 @@
                }
             );
 
-            for ( var i = 0; i < 25; ++i ) {
-               drawNode( [0.12 * i - 1.44,0], nodeTexts[ order[i] ] );
+            var maxlevel = 0;
+            for ( var i = 0; i < levels.length; ++i ) {
+               if ( maxlevel < levels[i] ) {
+                  maxlevel = levels[i];
+               }
+            }
+
+            for ( var j = 0; j <= maxlevel; ++j ) {
+               var num = 0;
+               for ( var i = 0; i < unionFind.length; ++i ) {
+                  if ( j == levels[ order[i] ] ) {
+                     ++num;
+                  }
+               }
+
+               if ( num > 0 ) {
+                  for ( var i = 0; i < unionFind.length; ++i ) {
+                     if ( j == levels[ order[i] ] ) {
+                        drawNode( [3.12 / num * i - 1.56,0], nodeTexts[ order[i] ] );
+                     }
+                  }
+               }
             }
          }
 
@@ -118,6 +138,7 @@
          function drawScene() {
             setTimeout( function() {
                drawBackground();
+ //              unionFind[22] = 0;
                drawNodes();
                ANIMATION = requestAnimationFrame(drawScene);
             }, 1000 / fps );
