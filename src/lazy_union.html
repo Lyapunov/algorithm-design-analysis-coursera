@@ -19,6 +19,8 @@
          var screenWidth  = mainItem.width  = window.innerWidth  - 20;
          var screenHeight = mainItem.height = window.innerHeight - 20;
          var screenScale  = Math.min( screenWidth, screenHeight ) / 2;
+         var screenWidthScale  = screenWidth / screenScale;
+         var screenHeightScale = screenHeight / screenScale;
 
          var fps = 25;
          var ANIMATION;
@@ -116,11 +118,13 @@
                }
             }
 
+            var num = 0;
             for ( var j = 0; j <= maxlevel; ++j ) {
-               var num = 0;
-               for ( var i = 0; i < unionFind.length; ++i ) {
-                  if ( j == levels[ order[i] ] ) {
-                     ++num;
+               if ( j == 0 ) {
+                  for ( var i = 0; i < unionFind.length; ++i ) {
+                     if ( j == levels[ order[i] ] ) {
+                        ++num;
+                     }
                   }
                }
 
@@ -128,7 +132,7 @@
                   var counter = 0;
                   for ( var i = 0; i < unionFind.length; ++i ) {
                      if ( j == levels[ order[i] ] ) {
-                        drawNode( [3.12 / num * counter - 1.56,j * (- 0.2) ], nodeTexts[ order[i] ] );
+                        drawNode( [screenWidthScale / (num + 1) * ( counter + 1 ) - screenWidthScale / 2,j * (- 0.2) ], nodeTexts[ order[i] ] );
                         ++counter;
                      }
                   }
@@ -150,6 +154,8 @@
             screenWidth  = mainItem.width  = window.innerWidth  - 20;
             screenHeight = mainItem.height = window.innerHeight - 20;
             screenScale  = Math.min( screenWidth, screenHeight ) / 2;
+            screenWidthScale  = screenWidth / screenScale;
+            screenHeightScale = screenHeight / screenScale;
 
             // starting the engine only if it is not running
             if ( !ANIMATION ) {
