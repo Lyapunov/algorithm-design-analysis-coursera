@@ -119,6 +119,7 @@
             }
 
             var num = 0;
+            var lastLevel = [];
             for ( var j = 0; j <= maxlevel; ++j ) {
                if ( j == 0 ) {
                   for ( var i = 0; i < unionFind.length; ++i ) {
@@ -130,12 +131,30 @@
 
                if ( num > 0 ) {
                   var counter = 0;
+                  var currentLevel = [];
                   for ( var i = 0; i < unionFind.length; ++i ) {
                      if ( j == levels[ order[i] ] ) {
-                        drawNode( [screenWidthScale / (num + 1) * ( counter + 1 ) - screenWidthScale / 2,j * (- 0.2) ], nodeTexts[ order[i] ] );
+                        var px = 0;
+                        var divi = 0;
+                        var py = j * (- 0.2);
+                        if ( j == 0 ) {
+                           px = screenWidthScale / (num + 1) * ( counter + 1 ) - screenWidthScale / 2;
+                           divi = 1;
+                        } else {
+                           lastLevel.forEach( function( arr ) {
+                              if ( arr[1] == order[i] ) {
+                                 px = px + arr[2];
+                                 ++divi;
+                              }
+                           } );
+                        }
+                        px = px / divi;
+                        drawNode( [px, py], nodeTexts[ order[i] ] );
+                        currentLevel.push( [order[i], unionFind[order[i]], px, py] );
                         ++counter;
                      }
                   }
+                  lastLevel = currentLevel;
                }
             }
          }
@@ -144,7 +163,8 @@
          function drawScene() {
             setTimeout( function() {
                drawBackground();
- //              unionFind[22] = 0;
+//               unionFind[20] = 0;
+//               unionFind[22] = 0;
                drawNodes();
                ANIMATION = requestAnimationFrame(drawScene);
             }, 1000 / fps );
