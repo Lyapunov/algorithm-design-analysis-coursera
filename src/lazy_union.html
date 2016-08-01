@@ -125,9 +125,11 @@
                }
 
                if ( num > 0 ) {
+                  var counter = 0;
                   for ( var i = 0; i < unionFind.length; ++i ) {
                      if ( j == levels[ order[i] ] ) {
-                        drawNode( [3.12 / num * i - 1.56,0], nodeTexts[ order[i] ] );
+                        drawNode( [3.12 / num * counter - 1.56,j * (- 0.2) ], nodeTexts[ order[i] ] );
+                        ++counter;
                      }
                   }
                }
