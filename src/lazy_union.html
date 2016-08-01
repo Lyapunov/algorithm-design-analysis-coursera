@@ -123,6 +123,10 @@
 
             var num = 0;
             var lastLevel = [];
+
+            var nodesToDraw = [];
+            var linesToDraw = [];
+
             for ( var j = 0; j <= maxlevel; ++j ) {
                if ( j == 0 ) {
                   for ( var i = 0; i < unionFind.length; ++i ) {
@@ -152,7 +156,14 @@
                            } );
                         }
                         px = px / divi;
-                        drawNode( [px, py], nodeTexts[ order[i] ] );
+                        if ( j != 0 ) {
+                           lastLevel.forEach( function( arr ) {
+                              if ( arr[1] == order[i] ) {
+                                 linesToDraw.push( [arr[0], order[i], [arr[2], arr[3]], [px, py]] );
+                              }
+                           } );
+                        }
+                        nodesToDraw.push ( [order[i], px, py, nodeTexts[ order[i] ] ] );
                         currentLevel.push( [order[i], unionFind[order[i]], px, py] );
                         ++counter;
                      }
@@ -160,14 +171,29 @@
                   lastLevel = currentLevel;
                }
             }
+
+            linesToDraw.forEach( function( arr ) {
+               context.strokeStyle = "yellow";
+               context.beginPath();
+               var pxy1 = getPixel( arr[2] );
+               var pxy2 = getPixel( arr[3] );
+               context.moveTo( pxy1[0], pxy1[1] );
+               context.lineTo( pxy2[0], pxy2[1] );
+               context.closePath();
+               context.stroke();
+            } );
+            nodesToDraw.forEach( function( arr ) {
+               drawNode( [arr[1], arr[2]], arr[3] );
+            } );
          }
 
          // common functions 
          function drawScene() {
             setTimeout( function() {
                drawBackground();
-//               unionFind[20] = 0;
-//               unionFind[22] = 0;
+               unionFind[20] = 0;
+               unionFind[22] = 0;
+               unionFind[0] = 3;
                drawNodes();
                ANIMATION = requestAnimationFrame(drawScene);
             }, 1000 / fps );
