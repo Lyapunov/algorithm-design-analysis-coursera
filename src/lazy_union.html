@@ -159,7 +159,7 @@
                         if ( j != 0 ) {
                            lastLevel.forEach( function( arr ) {
                               if ( arr[1] == order[i] ) {
-                                 linesToDraw.push( [arr[0], order[i], [arr[2], arr[3]], [px, py]] );
+                                 linesToDraw.push( [arr[0] * 100 + order[i], [arr[2], arr[3]], [px, py]] );
                               }
                            } );
                         }
@@ -175,8 +175,8 @@
             linesToDraw.forEach( function( arr ) {
                context.strokeStyle = "yellow";
                context.beginPath();
-               var pxy1 = getPixel( arr[2] );
-               var pxy2 = getPixel( arr[3] );
+               var pxy1 = getPixel( arr[1] );
+               var pxy2 = getPixel( arr[2] );
                context.moveTo( pxy1[0], pxy1[1] );
                context.lineTo( pxy2[0], pxy2[1] );
                context.closePath();
