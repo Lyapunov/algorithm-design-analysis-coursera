@@ -238,10 +238,10 @@
             while ( i1 < plan1[0].length && i2 < plan2[0].length ) {
                if ( plan1[0][i1][0] == plan2[0][i2][0] ) {
                   cplan.push( [ plan1[0][i1][0],
-                                [ (1 - ratio ) * plan1[0][i1][1][0] + ratio * plan2[0][i2][1][0], 
-                                  (1 - ratio ) * plan1[0][i1][1][1] + ratio * plan2[0][i2][1][1] ],
-                                [ (1 - ratio ) * plan1[0][i1][2][0] + ratio * plan2[0][i2][2][0], 
-                                  (1 - ratio ) * plan1[0][i1][2][1] + ratio * plan2[0][i2][2][1] ] ] );
+                                [ ( 1 - ratio ) * plan1[0][i1][1][0] + ratio * plan2[0][i2][1][0], 
+                                  ( 1 - ratio ) * plan1[0][i1][1][1] + ratio * plan2[0][i2][1][1] ],
+                                [ ( 1 - ratio ) * plan1[0][i1][2][0] + ratio * plan2[0][i2][2][0], 
+                                  ( 1 - ratio ) * plan1[0][i1][2][1] + ratio * plan2[0][i2][2][1] ] ] );
                   ++i1;
                   ++i2;
                } else {
