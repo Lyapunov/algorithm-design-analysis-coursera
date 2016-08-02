@@ -172,6 +172,18 @@
                }
             }
 
+            linesToDraw.sort(
+               function(a,b) {
+                  return a[0] > b[0];
+               }
+            );
+
+            nodesToDraw.sort(
+               function(a,b) {
+                  return a[0] > b[0];
+               }
+            );
+
             return [ linesToDraw, nodesToDraw ];
          }
 
@@ -195,9 +207,6 @@
          function drawScene() {
             setTimeout( function() {
                drawBackground();
-               unionFind[20] = 0;
-               unionFind[22] = 0;
-               unionFind[0] = 3;
                var plan = getPlan();
                drawPlan( plan );
                ANIMATION = requestAnimationFrame(drawScene);
