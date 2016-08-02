@@ -139,7 +139,7 @@
                          || getRepresentant(a) == getRepresentant(b)
                             && getDistToRepresentant(a) == getDistToRepresentant(b)
                             && getDistToRepresentant(unionFind[a]) == getDistToRepresentant(unionFind[b])
-                            && level[a] > level[b];
+                            && levels[a] > levels[b];
                }
             );
 
