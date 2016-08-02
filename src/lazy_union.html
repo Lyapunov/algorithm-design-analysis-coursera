@@ -88,6 +88,13 @@
             return getRepresentant( unionFind[num] );
          }
 
+         function getDistToRepresentant( num ) {
+            if ( num == unionFind[num] ) {
+               return 0;
+            }
+            return 1 + getDistToRepresentant( unionFind[num] );
+         }
+
          function doUnion( a, b ) {
             var x = getRepresentant(a);
             var y = getRepresentant(b);
@@ -125,10 +132,14 @@
                function(a,b) {
                   return getRepresentant(a) > getRepresentant(b)
                          || getRepresentant(a) == getRepresentant(b)
-                            && levels[a] > levels[b]
+                            && getDistToRepresentant(a) > getDistToRepresentant(b)
                          || getRepresentant(a) == getRepresentant(b)
-                            && levels[a] == levels[b]
-                            && unionFind[a] > unionFind[b];
+                            && getDistToRepresentant(a) == getDistToRepresentant(b)
+                            && getDistToRepresentant(unionFind[a]) > getDistToRepresentant(unionFind[b])
+                         || getRepresentant(a) == getRepresentant(b)
+                            && getDistToRepresentant(a) == getDistToRepresentant(b)
+                            && getDistToRepresentant(unionFind[a]) == getDistToRepresentant(unionFind[b])
+                            && level[a] > level[b];
                }
             );
 
