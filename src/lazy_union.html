@@ -23,6 +23,7 @@
          var screenHeightScale = screenHeight / screenScale;
 
          var fps = 25;
+         var frameCounter = 0;
          var ANIMATION;
 
          var alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -76,6 +77,14 @@
                return num;
             }
             return getRepresentant( unionFind[num] );
+         }
+
+         function doUnion( a, b ) {
+            var x = getRepresentant(a);
+            var y = getRepresentant(b);
+            if ( x != y ) {
+               unionFind[y] = x; 
+            }
          }
 
          function calculateLevels() {
@@ -203,13 +212,22 @@
             } );
          }
 
+         var plan = getPlan();
+         var nextPlan = [];
+         
          // common functions 
          function drawScene() {
             setTimeout( function() {
+               ++frameCounter;
                drawBackground();
-               var plan = getPlan();
                drawPlan( plan );
                ANIMATION = requestAnimationFrame(drawScene);
+               if ( frameCounter % fps == 0 ) {
+                  var x = Math.floor( Math.random() * unionFind.length );
+                  var y = Math.floor( Math.random() * unionFind.length );
+                  doUnion(x,y);
+                  plan = getPlan();
+               }
             }, 1000 / fps );
          }
 
