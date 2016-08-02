@@ -175,13 +175,13 @@
                         }
                         px = px / divi;
                         if ( j != 0 ) {
-                           lastLevel.forEach( function( arr ) {
-                              if ( arr[1] == order[i] ) {
-                                 linesToDraw.push( [arr[0] * 100 + order[i], [arr[2], arr[3]], [px, py]] );
+                           nodesToDraw.forEach( function( arr ) {
+                              if ( arr[4] == order[i] ) {
+                                 linesToDraw.push( [arr[0] * 100 + order[i], [arr[1], arr[2]], [px, py]] );
                               }
                            } );
                         }
-                        nodesToDraw.push ( [order[i], px, py, nodeTexts[ order[i] ] ] );
+                        nodesToDraw.push( [order[i], px, py, nodeTexts[ order[i] ], unionFind[order[i]] ] );
                         currentLevel.push( [order[i], unionFind[order[i]], px, py] );
                         ++counter;
                      }
