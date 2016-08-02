@@ -65,9 +65,18 @@
          }
 
          var unionFind = [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 ];
+         var unionNextX = -1;
+         var unionNextY = -1;
 
-         function drawNode( center, text ) {
-            drawCircle( center, 0.05, [0, 15, 0] );
+         function drawNode( num, center, text ) {
+            var ccolor = [0, 15, 0];
+            if ( num == unionNextX ) {
+               ccolor = [15,0,0];
+            }
+            if ( num == unionNextY ) {
+               ccolor = [15,0,15];
+            }
+            drawCircle( center, 0.05, ccolor );
             drawText  ( center, text, [15,15, 0] );
          }
          
@@ -152,7 +161,7 @@
                      if ( j == levels[ order[i] ] ) {
                         var px = 0;
                         var divi = 0;
-                        var py = -(j + 1) / Math.max(6, maxlevel + 2) + screenHeightScale / 2;
+                        var py = -(j + 1) / Math.max(6, maxlevel + 2) * 2 + screenHeightScale / 2;
                         if ( j == 0 ) {
                            px = screenWidthScale / (num + 1) * ( counter + 1 ) - screenWidthScale / 2;
                            divi = 1;
@@ -208,25 +217,65 @@
                context.stroke();
             } );
             plan[1].forEach( function( arr ) {
-               drawNode( [arr[1], arr[2]], arr[3] );
+               drawNode( arr[0], [arr[1], arr[2]], arr[3] );
             } );
          }
 
          var plan = getPlan();
-         var nextPlan = [];
+         var nextPlan = plan;
+
+         // ratio is in [0,1]
+         function getBetweenPlan( plan1, plan2, ratio ) {
+            if ( ratio < 0 ) {
+               ratio = 0;
+            }
+            if ( ratio > 1 ) {
+               ratio = 1;
+            }
+            var cplan = [];
+            var i1 = 0;
+            var i2 = 0;
+            while ( i1 < plan1[0].length && i2 < plan2[0].length ) {
+               if ( plan1[0][i1][0] == plan2[0][i2][0] ) {
+                  cplan.push( [ plan1[0][i1][0],
+                                [ (1 - ratio ) * plan1[0][i1][1][0] + ratio * plan2[0][i2][1][0], 
+                                  (1 - ratio ) * plan1[0][i1][1][1] + ratio * plan2[0][i2][1][1] ],
+                                [ (1 - ratio ) * plan1[0][i1][2][0] + ratio * plan2[0][i2][2][0], 
+                                  (1 - ratio ) * plan1[0][i1][2][1] + ratio * plan2[0][i2][2][1] ] ] );
+                  ++i1;
+                  ++i2;
+               } else {
+                  if ( plan1[0][i1][0] < plan2[0][i2][0] ) {
+                     ++i1;
+                  } else {
+                     ++i2;
+                  }
+               }
+            }
+            var nplan = [];
+            for ( var i = 0; i < plan1[1].length; ++i ) {
+               nplan.push(  [ plan1[1][i][0],
+                              ( 1 - ratio ) * plan1[1][i][1] + ratio * plan2[1][i][1],
+                              ( 1 - ratio ) * plan1[1][i][2] + ratio * plan2[1][i][2], 
+                              plan1[1][i][3] ] );
+            }
+            return [ cplan, nplan ];
+         }
          
          // common functions 
          function drawScene() {
             setTimeout( function() {
-               ++frameCounter;
                drawBackground();
-               drawPlan( plan );
+               var iplan = getBetweenPlan( plan, nextPlan, ( frameCounter % fps ) / fps );
+               drawPlan( iplan );
                ANIMATION = requestAnimationFrame(drawScene);
+               ++frameCounter;
                if ( frameCounter % fps == 0 ) {
-                  var x = Math.floor( Math.random() * unionFind.length );
-                  var y = Math.floor( Math.random() * unionFind.length );
-                  doUnion(x,y);
-                  plan = getPlan();
+                  unionNextX = Math.floor( Math.random() * unionFind.length );
+                  unionNextY = Math.floor( Math.random() * unionFind.length );
+                  doUnion(unionNextX,unionNextY);
+                  plan = nextPlan;
+                  nextPlan = getPlan();
                }
             }, 1000 / fps );
          }
