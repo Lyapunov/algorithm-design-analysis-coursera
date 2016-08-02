@@ -95,7 +95,7 @@
             return levels;
          }
 
-         function drawNodes() {
+         function getPlan() {
             // sort nodes by:
             //  - representant
             //  - level
@@ -172,7 +172,11 @@
                }
             }
 
-            linesToDraw.forEach( function( arr ) {
+            return [ linesToDraw, nodesToDraw ];
+         }
+
+         function drawPlan( plan ) {
+            plan[0].forEach( function( arr ) {
                context.strokeStyle = "yellow";
                context.beginPath();
                var pxy1 = getPixel( arr[1] );
@@ -182,7 +186,7 @@
                context.closePath();
                context.stroke();
             } );
-            nodesToDraw.forEach( function( arr ) {
+            plan[1].forEach( function( arr ) {
                drawNode( [arr[1], arr[2]], arr[3] );
             } );
          }
@@ -194,7 +198,8 @@
                unionFind[20] = 0;
                unionFind[22] = 0;
                unionFind[0] = 3;
-               drawNodes();
+               var plan = getPlan();
+               drawPlan( plan );
                ANIMATION = requestAnimationFrame(drawScene);
             }, 1000 / fps );
          }
