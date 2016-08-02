@@ -143,7 +143,7 @@
                      if ( j == levels[ order[i] ] ) {
                         var px = 0;
                         var divi = 0;
-                        var py = j * (- 0.2);
+                        var py = -(j + 1) / Math.max(6, maxlevel + 2) + screenHeightScale / 2;
                         if ( j == 0 ) {
                            px = screenWidthScale / (num + 1) * ( counter + 1 ) - screenWidthScale / 2;
                            divi = 1;
