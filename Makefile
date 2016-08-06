@@ -14,3 +14,6 @@ app:
 
 app/%: src/%.cpp
 	$(CC) $(CFLAGS) -O3 -o $@ $<
+
+clean:
+	rm -rf app
