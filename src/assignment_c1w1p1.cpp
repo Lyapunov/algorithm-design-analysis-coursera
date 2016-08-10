@@ -8,7 +8,7 @@
 #include <vector>
 #include <algorithm>
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 static bool readInput( std::string filename, std::vector<unsigned>& numbers, int debugmode = 0 )
 {
@@ -40,29 +40,32 @@ std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& rhs ) {
    return os;
 }
 
-// poor man's merge sort
+// poor man's merge sort, with embedded inversion counting
 class MergeSorter {
 public:
-   MergeSorter( std::vector<unsigned>& nums ) : numStorage_( nums ), mergeStorage_( numStorage_.size(), 0 ) {
-      mergeSort( 0, numStorage_.size() );
+   MergeSorter( std::vector<unsigned>& nums, long& inversions ) : numStorage_( nums ), mergeStorage_( numStorage_.size(), 0 ) {
+      inversions = mergeSort( 0, numStorage_.size() );
    }
    
 private:
-   void mergeSort( unsigned inc_start, unsigned exc_end ) {
+   long mergeSort( unsigned inc_start, unsigned exc_end ) {
       if ( exc_end <= 1 + inc_start ) {
          // at most 1 item, already sorted
-         return; 
+         return 0; 
       }
       unsigned half = ( inc_start + exc_end ) / 2;
-      mergeSort( inc_start, half ); 
-      mergeSort( half, exc_end ); 
+      long inversions = 0;
+      inversions += mergeSort( inc_start, half ); 
+      inversions += mergeSort( half, exc_end ); 
       // merging the results 
-      merge( inc_start, half, exc_end );
+      inversions += merge( inc_start, half, exc_end );
+      return inversions;
    }
 
-   void merge( unsigned inc_start, unsigned half, unsigned exc_end ) {
+   long merge( unsigned inc_start, unsigned half, unsigned exc_end ) {
       unsigned p1 = inc_start;
       unsigned p2 = half;
+      long inversions = 0;
       for ( unsigned i = 0; i < exc_end - inc_start; ++i ) {
          if ( p2 == exc_end || ( p1 < half && numStorage_[p1] < numStorage_[p2] ) ) {
             mergeStorage_[i] = numStorage_[p1]; 
@@ -70,20 +73,24 @@ private:
          } else {
             mergeStorage_[i] = numStorage_[p2]; 
             ++p2;
+
+            // counting inversions
+            inversions += half - p1;
          }
       }
       // copy to storage
       for ( unsigned i = 0; i < exc_end - inc_start; ++i ) {
          numStorage_[i + inc_start] = mergeStorage_[i];
       }
+      return inversions;
    }
 
    std::vector<unsigned>& numStorage_;
    std::vector<unsigned> mergeStorage_;
 };
 
-void merge_sort( std::vector<unsigned>& numbers ) {
-   MergeSorter x( numbers );
+void merge_sort( std::vector<unsigned>& numbers, long& inversions ) {
+   MergeSorter x( numbers, inversions );
 }
 
 int main( int argc, const char* argv[] ) {
@@ -103,11 +110,12 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-      merge_sort( nums );
+      long inversions;
+      merge_sort( nums, inversions );
       if ( DEBUG_MODE ) {
          std::cout << "=== PRINTING SORTED DATA" << std::endl;
          std::cout << nums;
       }
-
+      std::cout << inversions << std::endl;
    }
 }
