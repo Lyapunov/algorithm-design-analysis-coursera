@@ -3,6 +3,10 @@ set -x
 
 ./app/unit_tests
 
+# assignment c1w1p1
+./app/assignment_c1w1p1 ./inputs/input_c1w1p1_test.txt
+./app/assignment_c1w1p1 ./inputs/input_c1w1p1_target.txt
+
 # assignment c1w4p1
 ./app/assignment_c1w4p1 ./inputs/input_c1w4p1_test_1.txt
 ./app/assignment_c1w4p1 ./inputs/input_c1w4p1_target.txt
