@@ -8,7 +8,7 @@
 #include <vector>
 #include <algorithm>
 
-static const int DEBUG_MODE = 1;
+static const int DEBUG_MODE = 0;
 
 static bool readInput( std::string filename, std::vector<unsigned>& numbers, int debugmode = 0 )
 {
@@ -82,10 +82,25 @@ void test_middle_of_three() {
 }
 
 // --- famous quick sort
+
+int pivot_selection_method = 0; // kind of ugly
+
 void swap( unsigned& a, unsigned& b ) {
    unsigned tmp = a;
    a = b;
    b = tmp;
+}
+
+unsigned* choose_pivot( std::vector<unsigned>& input, unsigned left_index, unsigned right_index ) {
+   if ( pivot_selection_method == 1 ) {
+      return &input[right_index - 1];
+   }
+   if ( pivot_selection_method == 2 ) {
+      unsigned middle_pos = middle_position( input, left_index, right_index );
+      return middle_of_three( &input[left_index], &input[ middle_pos ], &input[right_index - 1] );
+   }
+
+   return &input[left_index];
 }
 
 // partition algorithm from the course material.
@@ -94,7 +109,9 @@ unsigned partition( std::vector<unsigned>& input, unsigned left_index, unsigned 
    unsigned* left  = &input[left_index];
    unsigned* right = &input[left_index] + right_index - left_index;
 
-   unsigned pivot = *left; // pivot is the first item
+   unsigned* pivot_position = choose_pivot( input, left_index, right_index ); // pivot is the first item
+   swap( *left, *pivot_position );
+   unsigned pivot = *left;
 
    unsigned* i = left + 1;
    for ( unsigned* j = left + 1; j < right; ++j ) {
@@ -137,13 +154,14 @@ int main( int argc, const char* argv[] ) {
       return 1;
    }
 
-   if ( argc != 2 ) {
-      std::cout << "USAGE: " << basename( argv[0] ) << " <filename>" << std::endl;
+   if ( argc != 3 ) {
+      std::cout << "USAGE: " << basename( argv[0] ) << " <pivot selection method: 0, 1 or 2> <filename>" << std::endl;
       return 0;
    } else {
-      std::string filename = argv[1];
+      pivot_selection_method = atoi( argv[1] );
+      std::string filename = argv[2];
       std::vector<unsigned> nums;
-      if ( !readInput( argv[1], nums, DEBUG_MODE ) ) {
+      if ( !readInput( filename.c_str(), nums, DEBUG_MODE ) ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
          return 1;
       }
