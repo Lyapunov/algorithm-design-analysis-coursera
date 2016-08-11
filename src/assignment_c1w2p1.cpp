@@ -66,20 +66,25 @@ unsigned partition( std::vector<unsigned>& input, unsigned left_index, unsigned 
 }
 
 // 'left' is inclusive, 'right' is exclusive.
-void quick_sort( std::vector<unsigned>& input, unsigned left_index, unsigned right_index ) {
+long quick_sort( std::vector<unsigned>& input, unsigned left_index, unsigned right_index ) {
    if ( right_index <= left_index + 1 ) {
-      return;
+      return 0;
    }
 
-   std::cout << "quick_sort " << left_index << " " << right_index << std::endl;
+   if ( DEBUG_MODE ) {
+      std::cout << "quick_sort (" << left_index << ", " << right_index << ") , cost:" << ( right_index - left_index - 1 ) << std::endl;
+   }
    unsigned pivot_position = partition( input, left_index, right_index );
 
-   quick_sort( input, left_index, pivot_position );
-   quick_sort( input, pivot_position + 1, right_index );
+   long comparsions = right_index - left_index - 1; // we know this about the current pivoting algorith
+   comparsions += quick_sort( input, left_index, pivot_position );
+   comparsions += quick_sort( input, pivot_position + 1, right_index );
+   
+   return comparsions;
 }
 
-void quick_sort( std::vector<unsigned>& input ) {
-   quick_sort( input, 0, input.size() );
+long quick_sort( std::vector<unsigned>& input ) {
+   return quick_sort( input, 0, input.size() );
 }
 
 int main( int argc, const char* argv[] ) {
@@ -99,10 +104,18 @@ int main( int argc, const char* argv[] ) {
          return 1;
       }
 
-      std::vector<unsigned> example( { 3, 8, 2, 5, 1, 4, 7, 6 } );
+      if ( DEBUG_MODE ) {
+         std::cout << "=== INPUT:" << std::endl;
+         std::cout << nums << std::endl;
+      }
 
-      std::cout << example << std::endl;
-      quick_sort( example );
-      std::cout << example << std::endl;
+      long comparsions = quick_sort( nums );
+
+      if ( DEBUG_MODE ) {
+         std::cout << std::endl << "=== OUTPUT:" << std::endl;
+         std::cout << nums << std::endl;
+      }
+
+      std::cout << comparsions << std::endl;
    }
 }
