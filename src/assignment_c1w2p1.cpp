@@ -8,7 +8,7 @@
 #include <vector>
 #include <algorithm>
 
-static const int DEBUG_MODE = 0;
+static const int DEBUG_MODE = 1;
 
 static bool readInput( std::string filename, std::vector<unsigned>& numbers, int debugmode = 0 )
 {
@@ -87,20 +87,42 @@ long quick_sort( std::vector<unsigned>& input ) {
    return quick_sort( input, 0, input.size() );
 }
 
-unsigned middle( std::vector<unsigned>& input, unsigned left_index, unsigned right_index ) {
+unsigned middle_position( std::vector<unsigned>& input, unsigned left_index, unsigned right_index ) {
    if ( right_index <= left_index ) {
-      std::cout << "ERROR in middle computation." << std::endl;
+      std::cout << "ERROR in middle_position computation." << std::endl;
       return left_index;
    }
    unsigned k = ( right_index - left_index - 1) / 2;
    return left_index + k;
 }
 
-void test_middle() {
+bool is_first_in_the_middle( unsigned* pos1, unsigned *pos2, unsigned *pos3 ) {
+   return *pos1 <= std::max( *pos2, *pos3 ) && *pos1 >= std::min( *pos2, *pos3 );
+}
+
+unsigned* middle_of_three( unsigned* pos1, unsigned *pos2, unsigned *pos3 ) {
+   if ( is_first_in_the_middle( pos1, pos2, pos3 ) ) {
+      return pos1;
+   }
+   if ( is_first_in_the_middle( pos2, pos1, pos3 ) ) {
+      return pos2;
+   }
+   return pos3;
+}
+
+void test_middle_position() {
    std::vector<unsigned> example3( { 8, 2, 4, 5, 7, 1 } );
    for ( unsigned y = 0; y < example3.size(); ++y ) {
       unsigned z = y +1;
-      std::cout << " middle of " << example3 << " [0," << z << "[ is " << middle( example3, 0, z ) << std::endl;
+      std::cout << " middle_position of " << example3 << " [0," << z << "[ is " << middle_position( example3, 0, z ) << std::endl;
+   }
+}
+
+void test_middle_of_three() {
+   std::vector<unsigned> example3( { 8, 2, 4, 5, 6, 7, 1, 3, 2 } );
+   for ( unsigned y = 0; y < example3.size()-2; ++y ) {
+      std::cout << " middle of (" << example3[y] << ", " << example3[y+1] << ", " << example3[y+2] << ") is :"
+         << *middle_of_three( &example3[y], &example3[y+1], &example3[y+2] ) << std::endl;
    }
 }
 
@@ -123,7 +145,9 @@ int main( int argc, const char* argv[] ) {
 
       if ( DEBUG_MODE ) {
          std::cout << "=== TESTS:" << std::endl;
-         test_middle();
+         test_middle_position();
+         test_middle_of_three();
+         std::cout << std::endl;
          std::cout << "=== INPUT:" << std::endl;
          std::cout << nums << std::endl << std::endl;
       }
