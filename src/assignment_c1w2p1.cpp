@@ -32,11 +32,11 @@ static bool readInput( std::string filename, std::vector<unsigned>& numbers, int
 }
 
 std::ostream& operator<<( std::ostream& os, const std::vector<unsigned>& rhs ) {
-   os << "vector(" << std::endl;
+   os << "vector(";
    for ( const auto& elem : rhs ) {
-      os << "   " << elem << std::endl;
+      os << " " << elem;
    }
-   os << ")" << std::endl;
+   os << " )";
    return os;
 }
 
@@ -87,6 +87,23 @@ long quick_sort( std::vector<unsigned>& input ) {
    return quick_sort( input, 0, input.size() );
 }
 
+unsigned middle( std::vector<unsigned>& input, unsigned left_index, unsigned right_index ) {
+   if ( right_index <= left_index ) {
+      std::cout << "ERROR in middle computation." << std::endl;
+      return left_index;
+   }
+   unsigned k = ( right_index - left_index - 1) / 2;
+   return left_index + k;
+}
+
+void test_middle() {
+   std::vector<unsigned> example3( { 8, 2, 4, 5, 7, 1 } );
+   for ( unsigned y = 0; y < example3.size(); ++y ) {
+      unsigned z = y +1;
+      std::cout << " middle of " << example3 << " [0," << z << "[ is " << middle( example3, 0, z ) << std::endl;
+   }
+}
+
 int main( int argc, const char* argv[] ) {
    // Prints each argument on the command line.
    if ( argc < 1 ) {
@@ -105,15 +122,17 @@ int main( int argc, const char* argv[] ) {
       }
 
       if ( DEBUG_MODE ) {
+         std::cout << "=== TESTS:" << std::endl;
+         test_middle();
          std::cout << "=== INPUT:" << std::endl;
-         std::cout << nums << std::endl;
+         std::cout << nums << std::endl << std::endl;
       }
 
       long comparsions = quick_sort( nums );
 
       if ( DEBUG_MODE ) {
          std::cout << std::endl << "=== OUTPUT:" << std::endl;
-         std::cout << nums << std::endl;
+         std::cout << nums << std::endl << std::endl;
       }
 
       std::cout << comparsions << std::endl;
