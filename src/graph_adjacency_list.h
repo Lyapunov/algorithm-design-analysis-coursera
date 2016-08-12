@@ -188,6 +188,57 @@ bool readGraph( std::string filename, GraphAL& graph, int debugmode = 0 )
    }
 }
 
+bool readALGraphWithoutCosts( std::string filename, GraphAL& graph, int debugmode = 0 )
+{
+   std::ifstream is;
+   is.open( filename.c_str() );
+
+   // first line
+   std::string line;
+   if ( !std::getline( is, line ) ) {
+      return false;
+   }
+   std::istringstream ss(line);
+
+   GraphAL retval;
+
+   if ( !(ss >> retval.n ) ) {
+      return false;
+   }
+
+   if ( debugmode ) {
+      std::cout << "=== READING GRAPH(" << retval.n << ")" << std::endl;
+   }
+
+   int number = 0;
+   int loopNumber = 0;
+   while (true) {
+      if ( !std::getline( is, line ) ) {
+         is.close();
+         graph = retval;
+         return true;
+      }
+      std::istringstream ss(line);
+      ++loopNumber;
+      ss >> number;
+      if ( loopNumber != number ) {
+         return false;
+      }
+      retval.alist.push_back( std::vector<Edge>() );
+      while ( ss ) {
+         Edge edge;
+         edge.first = number;
+         if ( !( ss >> edge.second ) ) {
+            continue;
+         }
+         edge.cost = 1;
+         --edge.first;
+         --edge.second;
+         retval.alist[number - 1].push_back( edge );
+      }
+   }
+}
+
 template < class GraphRepresentant = GraphAL >
 bool readALGraphFromEdgeList( std::string filename, GraphRepresentant& graph, int debugmode = 0 )
 {
