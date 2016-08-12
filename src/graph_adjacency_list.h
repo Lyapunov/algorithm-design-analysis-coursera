@@ -28,6 +28,20 @@ struct GraphAL {
       }
       return retval;
    }
+   Graph undirectedEdgeList() const {
+      Graph retval;
+      retval.n = this->n;
+      for ( const auto& inlist : this->alist ) {
+         for ( const auto& elem : inlist ) {
+            if ( elem.first < elem.second ) {
+               retval.edges.push_back( elem );
+            }
+         }
+      }
+      retval.m = retval.edges.size();
+      return retval;
+   }
+
    void init( unsigned n ) {
       alist = std::vector< std::vector<Edge> >( n );
    }
