@@ -20,15 +20,17 @@ int main( int argc, const char* argv[] ) {
       std::cout << "USAGE: " << basename( argv[0] ) << " <filename> " << std::endl;
       return 0;
    } else{ 
-      GraphAL graph;
+      GraphAL graph_al;
       std::string filename = argv[1];
-      if ( !readALGraphWithoutCosts( filename, graph, DEBUG_MODE ) ) {
+      if ( !readALGraphWithoutCosts( filename, graph_al, DEBUG_MODE ) ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
          return 1;
       }
+      Graph graph = graph_al.undirectedEdgeList();
       if ( DEBUG_MODE ) {
+         std::cout << graph_al << std::endl;
          std::cout << graph << std::endl;
       }
-
+      
    }
 }
