@@ -49,10 +49,12 @@ int main( int argc, const char* argv[] ) {
 
       std::vector<int> result = dijkstra( graph, start_node - 1 );
 //      std::vector<int> result = bellman_ford( graph, start_node - 1 );
-      int total = 0;
       for ( const auto& elem : end_nodes ) {
-         total += result[ elem - 1 ];
+         std::cout << result[ elem - 1 ];
+         if ( static_cast<unsigned>( &elem - &end_nodes[0] ) < end_nodes.size() - 1 ) {
+            std::cout << ",";
+         }
       }
-      std::cout << total << std::endl;
+      std::cout << std::endl;
    }
 }
