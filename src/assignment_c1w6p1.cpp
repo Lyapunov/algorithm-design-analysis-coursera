@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <unordered_set>
 #include <vector>
 
 #include "fast_integer_file_reader.h"
@@ -32,5 +33,7 @@ int main( int argc, const char* argv[] ) {
          std::cout << input << std::endl;
          std::cout << input.size() << std::endl;
       }
+
+      std::unordered_set<long> lookup( input.begin(), input.end() );
    }
 }
