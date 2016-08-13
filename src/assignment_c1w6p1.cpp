@@ -57,7 +57,7 @@ int main( int argc, const char* argv[] ) {
             if ( DEBUG_MODE ) {
                std::cout << input[i] << " " << input[j] << " " << ( input[i] + input[j] ) << std::endl;
             }
-            if ( input[i] != input[j] ) {
+            if ( input[i] < input[j] ) {
                ++counter;
             }
             --j;
