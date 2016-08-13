@@ -22,7 +22,7 @@ int main( int argc, const char* argv[] ) {
       return 0;
    } else{ 
       std::vector<long> input;
-      input.reserve(1100000);
+      input.reserve(20000);
       std::string filename = argv[1];
       if ( !fastIntegerFileReader( filename, input, DEBUG_MODE ) ) {
          std::cerr << "ERROR during attempting to read file " << filename << std::endl;
