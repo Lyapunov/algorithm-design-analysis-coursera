@@ -6,6 +6,7 @@ CFLAGS =-Wall -std=c++11
 
 CPP_FILES := $(wildcard src/*.cpp)
 APP_FILES := $(addprefix app/,$(notdir $(CPP_FILES:.cpp=)))
+PWD := $(shell pwd)
 
 all: app $(APP_FILES)
 
@@ -17,3 +18,16 @@ app/%: src/%.cpp
 
 clean:
 	rm -rf app
+
+
+# Creating input files from zipped inputs:
+# ----------------------------------------
+GZ_FILES := $(wildcard zipped_inputs/*.gz)
+
+inputs: inputsdir $(GZ_FILES)
+
+inputsdir:
+	mkdir -p inputs
+
+zipped_inputs/%: inputsdir
+	@src/input_uncompress $@ $(PWD)/inputs/
