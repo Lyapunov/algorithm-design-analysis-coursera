@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+use strict;
+use File::Basename;
+
+my $progName = basename( $0 );
+
+if ( @ARGV != 2 ) {
+   print "USAGE: $progName <filename> <outdir>\n";
+}
+
+my ( $filename, $outdir ) = @ARGV;
+
+die "Outdir argument is not valid" unless ( defined $outdir && -d $outdir );
+
+my ( $txtname ) = ( $filename =~ m/^(.*\.txt)$/ );
+
+die "Filename '$filename' must match to pattern '*.txt'\n" unless defined $txtname;
+
+my $scheme = 0;
+if ( $txtname =~ m/c1w4p1/ ) {
+   $scheme = 7;
+}
+if ( $txtname =~ m/c1w6p1/ ) {
+   $scheme = 19;
+}
+if ( $txtname =~ m/c2w6p1/ ) {
+   $scheme = 27;
+}
+
+
+my $outfile = $scheme
+              ? $outdir.'/'."$txtname.scheme.$scheme"
+              : $outdir.'/'."$txtname"; 
+
+open( INPUT, "<$filename" );
+open( my $out, '>:raw', $outfile );
+
+if ( $scheme == 0 ) {
+   while (<INPUT>) {
+      print $out $_;
+   }
+} elsif ( $scheme == 7 ) {
+   my $counter = 1;
+   while (<INPUT>) {
+      my ( $first, $second ) = ( $_ =~ m/^(\d*)\s\s*(\d*)\s*$/ );
+      if ( !defined $second ) {
+         die "Invalid file format.";
+      }
+      while ( !( $first == $counter ) ) {
+         ++$counter;
+         print $out "\xff";
+      }
+      my $nik = pack( 'N', $second );
+      print $out $nik;
+   }
+} elsif ( $scheme == 19 ) {
+   my $before = <INPUT>;
+   my $nik0 = pack( 'q', $before );
+   print $out $nik0;
+   while (<INPUT>) {
+      my ( $num ) = ( $_ =~ m/^([+-\d]\d*)$/ );
+      if ( !defined $num ) {
+         die "Invalid file format.";
+      }
+      my $diff = $num - $before;
+      $before = $num;
+      if ( $diff >= 256 * 256 * 256 * 256 ) {
+         die "Two large diffs at $before";
+      }
+      if ( $diff < 0 ) {
+         die "Invalid file format - numbers must be sorted.";
+      }
+      my $nik = pack( 'l', $diff );
+      print $out $nik;
+   }
+} elsif ( $scheme == 27 ) {
+   my $value = <INPUT>;
+   my $nik0 = pack( 'l', $value );
+   print $out $nik0;
+   my ( $num1, $num2 ) = ( <INPUT> =~ m/^([+-\d]\d*)\s\s*([+-\d]\d*)\s*$/ );
+   if ( !defined $num2 ) {
+      die "Invalid file format.";
+   }
+   my $nik1 = pack( 'l', $num1 );
+   my $nik2 = pack( 'l', $num2 );
+   print $out $nik1;
+   print $out $nik2;
+   while (<INPUT>) {
+      my ( $val1, $val2 ) = ( $_ =~ m/^([+-\d]\d*)\s\s*([+-\d]\d*)\s*$/ );
+      if ( !defined $val2 ) {
+         die "Invalid file format: >$_<!";
+      }
+      my $diff = $val1 - $num1;
+      if ( $diff < 0 ) {
+         die "Invalid file format - numbers must be sorted. $num1 $val1, $_";
+      }
+      if ( $diff > 63 ) {
+         die "Invalid file format - too big jump. $num1 $val1";
+      }
+      $num1 = $val1;
+      my $nik = pack( 'l', ( $val2 * 64 + $diff ) );
+      print $out $nik;
+   }
+}
+
+close ( $out );
+close ( INPUT );
+
+`gzip $outfile`;

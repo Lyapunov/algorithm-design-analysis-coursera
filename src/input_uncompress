@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+
+use strict;
+use File::Basename;
+
+my $progName = basename( $0 );
+
+if ( @ARGV != 2 ) {
+   print "USAGE: $progName <filename> <outdir>\n";
+}
+
+my ( $filename, $outdir ) = @ARGV;
+
+die "Outdir argument is not valid" unless ( defined $outdir && -d $outdir );
+
+my ( $txtname, $rest ) = ( $filename =~ m/^(.*\.txt)(.*\.gz)$/ );
+
+die "Filename '$filename' must match to pattern '*.txt.*.gz'\n" unless defined $rest;
+
+my $scheme = 0;
+if ( $filename =~ m/\.scheme\.(\d*)\./ ) {
+   $scheme = $1;
+}
+
+open( my $inf, 'zcat '.$filename.' |' );
+binmode($inf);
+open( my $outf, '>'.$outdir.'/'.$txtname );
+
+if ( $scheme == 0 ) {
+   while ( <$inf> ) {
+      print $outf $_;
+   }
+} elsif ( $scheme == 7 ) {
+   my $counter = 1;
+   local $/ = \1;
+   my $collector = "";
+   while ( my $byte = <$inf> ) {
+      my $ordi = ord($byte);
+      if ( $ordi == 255 & $collector eq "" ) {
+         ++$counter;
+      } else {
+         $collector = $collector. $byte;
+         if ( length( $collector ) == 4 ) {
+            my $value = unpack( 'N', $collector );
+            print $outf "$counter $value \n";
+            $collector = "";
+         }
+      }
+   }
+} elsif ( $scheme == 19 ) {
+   local $/ = \1;
+   my $qbytes = <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   $qbytes = $qbytes . <$inf>;
+   my $value = unpack( 'q', $qbytes );
+   print $outf "$value\n";
+
+   while ( my $byte = <$inf> ) {
+      my $lbytes = $byte;
+      $lbytes = $lbytes . <$inf>;
+      $lbytes = $lbytes . <$inf>;
+      $lbytes = $lbytes . <$inf>;
+      my $diff = unpack( 'l', $lbytes );
+      $value += $diff;
+      print $outf "$value\n";
+   }
+} elsif ( $scheme == 27 ) {
+   local $/ = \1;
+   my $lbytes = <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   my $first = unpack( 'l', $lbytes );
+   $lbytes = <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   my $before = unpack( 'l', $lbytes );
+   $lbytes = <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   $lbytes = $lbytes . <$inf>;
+   my $value = unpack( 'l', $lbytes );
+   print $outf "$first\n";
+   print $outf "$before $value\n";
+   while ( my $byte = <$inf> ) {
+      $lbytes = $byte;
+      $lbytes = $lbytes . <$inf>;
+      $lbytes = $lbytes . <$inf>;
+      $lbytes = $lbytes . <$inf>;
+      my $compr = unpack( 'l', $lbytes );
+      my $diff = $compr % 64;
+      my $other = ( $compr - $diff ) / 64;
+      $before += $diff;
+      print $outf "$before $other\n";
+   }
+}
+
+close ( $inf );
+close ( $outf );
