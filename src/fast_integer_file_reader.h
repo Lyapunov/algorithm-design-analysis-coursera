@@ -67,7 +67,7 @@ bool fastIntegerFileReader( std::string filename, std::vector<long>& retval, int
 std::ostream& operator<<( std::ostream& os, const std::vector<long>& vector ) {
    os << "vector(";
    for ( const auto& elem : vector ) {
-      os << " " << elem;
+      os << " " << elem << std::endl;
    }
    os << " )";
    return os;
