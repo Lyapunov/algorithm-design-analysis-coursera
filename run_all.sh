@@ -26,6 +26,12 @@ set -x
 ./app/assignment_c1w5p1 ./inputs/input_c1w5p1_test.txt 1 4
 ./app/assignment_c1w5p1 ./inputs/input_c1w5p1_target.txt 1 7 37 59 82 99 115 133 165 188 197
 
+# assignment c1w6p1
+./app/assignment_c1w6p1 ./inputs/input_c1w6p1_target.txt
+
+# assignment c1w6p2
+./app/assignment_c1w6p2 ./inputs/input_c1w6p2_target.txt
+
 # assignment c2w2p1
 ./app/assignment_c2w1p1 inputs/input_c2w1p1_bad.txt
 ./app/assignment_c2w1p1 inputs/input_c2w1p1_test_1.txt
