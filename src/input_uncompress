@@ -13,7 +13,9 @@ my ( $filename, $outdir ) = @ARGV;
 
 die "Outdir argument is not valid" unless ( defined $outdir && -d $outdir );
 
-my ( $txtname, $rest ) = ( $filename =~ m/^(.*\.txt)(.*\.gz)$/ );
+my ( $txtnamewithpath, $rest ) = ( $filename =~ m/^(.*\.txt)(.*\.gz)$/ );
+
+my $txtname = basename($txtnamewithpath);
 
 die "Filename '$filename' must match to pattern '*.txt.*.gz'\n" unless defined $rest;
 
@@ -103,3 +105,6 @@ if ( $scheme == 0 ) {
 
 close ( $inf );
 close ( $outf );
+chmod( my $ucname = "$outdir/$txtname" );
+
+print "Uncompressed $ucname.\n";
