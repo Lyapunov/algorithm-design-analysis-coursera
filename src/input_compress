@@ -24,7 +24,7 @@ if ( $txtname =~ m/c1w4p1/ ) {
 if ( $txtname =~ m/c1w6p1/ ) {
    $scheme = 19;
 }
-if ( $txtname =~ m/c2w6p1/ ) {
+if ( $txtname =~ m/c2w6p1_target/ ) {
    $scheme = 27;
 }
 
