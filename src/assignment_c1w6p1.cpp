@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <set>
 
 #include "fast_integer_file_reader.h"
 
@@ -31,7 +32,7 @@ int main( int argc, const char* argv[] ) {
 
       if ( DEBUG_MODE ) {
          std::cout << input << std::endl;
-         std::cout << input.size() << std::endl;
+         std::cout << "===" << input.size() << std::endl;
       }
 
       std::sort( input.begin(), input.end() );
@@ -40,7 +41,7 @@ int main( int argc, const char* argv[] ) {
       long upper = 10000;  // inclusive
       unsigned first = input.size() - 1;
 
-      long counter = 0;
+      std::set<unsigned> targets;
 
       // lower <= x + y < upper
       for ( unsigned i = 0; i < input.size() - 1; ++i ) {
@@ -58,11 +59,11 @@ int main( int argc, const char* argv[] ) {
                std::cout << input[i] << " " << input[j] << " " << ( input[i] + input[j] ) << std::endl;
             }
             if ( input[i] < input[j] ) {
-               ++counter;
+               targets.insert( input[i] + input[j] );
             }
             --j;
          }
       }
-      std::cout << counter << std::endl;
+      std::cout << targets.size() << std::endl;
    }
 }
