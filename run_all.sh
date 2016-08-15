@@ -96,3 +96,4 @@ set -x
 ./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_5.txt
 ./app/assignment_c2w6p1 ./inputs/input_c2w6p1_target_6.txt
 
+exit 0

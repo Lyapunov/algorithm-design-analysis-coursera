@@ -31,3 +31,11 @@ inputsdir:
 
 zipped_inputs/%: inputsdir
 	@src/input_uncompress $@ $(PWD)/inputs/
+
+# Solving:
+# --------
+solve: solutions.txt
+
+solutions.txt:
+	@echo Creating solutions.txt
+	@./run_all.sh >solutions.txt 2>&1 
